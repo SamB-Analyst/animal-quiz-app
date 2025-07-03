@@ -1,3 +1,11 @@
+// No imports needed - React is loaded globally
+const { useState, useEffect } = React;
+
+// For icons, we'll use emojis or create simple SVG components
+const Star = () => React.createElement('span', null, '⭐');
+const Trophy = () => React.createElement('span', null, '🏆');
+const Book = () => React.createElement('span', null, '📚');
+
 const AnimalQuizApp = () => {
   const [currentScreen, setCurrentScreen] = useState('welcome');
   const [playerName, setPlayerName] = useState('');
