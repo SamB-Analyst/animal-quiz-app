@@ -1,10 +1,13 @@
-// No imports needed - React is loaded globally
 const { useState, useEffect } = React;
 
-// For icons, we'll use emojis or create simple SVG components
-const Star = () => React.createElement('span', null, '⭐');
-const Trophy = () => React.createElement('span', null, '🏆');
-const Book = () => React.createElement('span', null, '📚');
+// Icon components using emojis (replacing lucide-react icons)
+const StarIcon = () => React.createElement('span', { className: 'inline-block text-yellow-500' }, '⭐');
+const TrophyIcon = () => React.createElement('span', { className: 'inline-block' }, '🏆');
+const BookIcon = () => React.createElement('span', { className: 'inline-block' }, '📚');
+const HomeIcon = () => React.createElement('span', { className: 'inline-block' }, '🏠');
+const PlayIcon = () => React.createElement('span', { className: 'inline-block' }, '▶️');
+const AwardIcon = () => React.createElement('span', { className: 'inline-block' }, '🏅');
+const HeartIcon = () => React.createElement('span', { className: 'inline-block text-red-500' }, '❤️');
 
 const AnimalQuizApp = () => {
   const [currentScreen, setCurrentScreen] = useState('welcome');
@@ -55,8 +58,31 @@ const AnimalQuizApp = () => {
       { question: "Which animal never forgets?", options: ["Mouse", "Elephant", "Cat", "Dog"], correct: 1, image: "🐘" },
       { question: "How many chambers does a cow's stomach have?", options: ["1", "2", "3", "4"], correct: 3, image: "🐄" },
       { question: "Which animal can sleep for 3 years?", options: ["Bear", "Snail", "Turtle", "Frog"], correct: 1, image: "🐌" }
+    ],
+    4: [
+      { question: "Which animal has three hearts?", options: ["Octopus", "Elephant", "Whale", "Shark"], correct: 0, image: "🐙" },
+      { question: "How many teeth does a shark have?", options: ["32", "100", "300+", "50"], correct: 2, image: "🦈" },
+      { question: "Which animal can live without water the longest?", options: ["Camel", "Kangaroo rat", "Penguin", "Polar bear"], correct: 1, image: "🐭" },
+      { question: "What is a baby kangaroo called?", options: ["Cub", "Pup", "Joey", "Kit"], correct: 2, image: "🦘" },
+      { question: "Which animal has the strongest bite?", options: ["Lion", "Crocodile", "Shark", "Hippo"], correct: 1, image: "🐊" },
+      { question: "How many bones do sharks have?", options: ["200", "100", "50", "0"], correct: 3, image: "🦈" },
+      { question: "Which animal can't stick out its tongue?", options: ["Dog", "Cat", "Crocodile", "Lizard"], correct: 2, image: "🐊" },
+      { question: "What color is a polar bear's skin?", options: ["White", "Pink", "Black", "Brown"], correct: 2, image: "🐻‍❄️" },
+      { question: "Which animal has rectangular pupils?", options: ["Cat", "Goat", "Dog", "Horse"], correct: 1, image: "🐐" },
+      { question: "How many species of penguins exist?", options: ["10", "17", "25", "30"], correct: 1, image: "🐧" }
+    ],
+    5: [
+      { question: "Which animal has blue blood?", options: ["Octopus", "Fish", "Whale", "Dolphin"], correct: 0, image: "🐙" },
+      { question: "How long is an elephant pregnant?", options: ["9 months", "12 months", "18 months", "22 months"], correct: 3, image: "🐘" },
+      { question: "Which animal sleeps the most?", options: ["Cat", "Sloth", "Koala", "Brown bat"], correct: 3, image: "🦇" },
+      { question: "What percentage of their lives do cats spend sleeping?", options: ["50%", "60%", "70%", "80%"], correct: 2, image: "🐱" },
+      { question: "Which animal has the most powerful jaw muscles?", options: ["Lion", "Crocodile", "Hyena", "Shark"], correct: 2, image: "🦈" },
+      { question: "How many chambers does a fish heart have?", options: ["1", "2", "3", "4"], correct: 1, image: "🐠" },
+      { question: "Which animal can hold its breath the longest?", options: ["Whale", "Dolphin", "Cuvier's beaked whale", "Seal"], correct: 2, image: "🐋" },
+      { question: "What is the largest living bird?", options: ["Eagle", "Ostrich", "Albatross", "Condor"], correct: 1, image: "🐦" },
+      { question: "Which animal has the best memory?", options: ["Elephant", "Dolphin", "Chimpanzee", "Crow"], correct: 0, image: "🐘" },
+      { question: "How many eyes does a bee have?", options: ["2", "3", "4", "5"], correct: 3, image: "🐝" }
     ]
-    // Additional levels would continue with increasing complexity...
   };
 
   // Available stickers that can be purchased
@@ -70,7 +96,12 @@ const AnimalQuizApp = () => {
     { id: 7, emoji: "🦋", name: "Pretty Butterfly", cost: 12 },
     { id: 8, emoji: "🐠", name: "Colorful Fish", cost: 8 },
     { id: 9, emoji: "🦜", name: "Talking Parrot", cost: 18 },
-    { id: 10, emoji: "🦘", name: "Jumping Kangaroo", cost: 22 }
+    { id: 10, emoji: "🦘", name: "Jumping Kangaroo", cost: 22 },
+    { id: 11, emoji: "🐙", name: "Smart Octopus", cost: 30 },
+    { id: 12, emoji: "🦈", name: "Cool Shark", cost: 28 },
+    { id: 13, emoji: "🐺", name: "Wild Wolf", cost: 25 },
+    { id: 14, emoji: "🦅", name: "Majestic Eagle", cost: 35 },
+    { id: 15, emoji: "🐯", name: "Fierce Tiger", cost: 40 }
   ];
 
   const handleAnswerSelect = (answerIndex) => {
@@ -93,7 +124,7 @@ const AnimalQuizApp = () => {
   };
 
   const getCurrentQuestions = () => {
-    return quizData[Math.min(currentLevel, 3)] || quizData[3]; // Use level 3 for higher levels as demo
+    return quizData[Math.min(currentLevel, 5)] || quizData[5]; // Use level 5 for higher levels
   };
 
   const buySticker = (sticker) => {
@@ -122,78 +153,78 @@ const AnimalQuizApp = () => {
 
   // Welcome Screen
   if (currentScreen === 'welcome') {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-400 flex flex-col items-center justify-center p-4">
-        <div className="bg-white rounded-3xl p-8 shadow-2xl max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🦁🐘🦒</div>
-          <h1 className="text-3xl font-bold text-purple-600 mb-4">Animal Facts Quiz!</h1>
-          <p className="text-gray-600 mb-6">Learn amazing facts about animals while having fun!</p>
-          
-          <div className="mb-6">
-            <label className="block text-left text-purple-600 font-semibold mb-2">What's your name?</label>
-            <input
-              type="text"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              className="w-full p-3 border-2 border-purple-300 rounded-xl text-lg focus:border-purple-500 focus:outline-none"
-              placeholder="Enter your name here"
-            />
-          </div>
-          
-          <button
-            onClick={() => playerName.trim() && setCurrentScreen('menu')}
-            disabled={!playerName.trim()}
-            className="w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
-            Let's Start! 🚀
-          </button>
-        </div>
-      </div>
+    return React.createElement('div', {
+      className: 'min-h-screen bg-gradient-to-b from-blue-400 to-green-400 flex flex-col items-center justify-center p-4'
+    }, 
+      React.createElement('div', {
+        className: 'bg-white rounded-3xl p-8 shadow-2xl max-w-md w-full text-center'
+      },
+        React.createElement('div', { className: 'text-6xl mb-4' }, '🦁🐘🦒'),
+        React.createElement('h1', { className: 'text-3xl font-bold text-purple-600 mb-4' }, 'Animal Facts Quiz!'),
+        React.createElement('p', { className: 'text-gray-600 mb-6' }, 'Learn amazing facts about animals while having fun!'),
+        
+        React.createElement('div', { className: 'mb-6' },
+          React.createElement('label', { className: 'block text-left text-purple-600 font-semibold mb-2' }, 'What\'s your name?'),
+          React.createElement('input', {
+            type: 'text',
+            value: playerName,
+            onChange: (e) => setPlayerName(e.target.value),
+            className: 'w-full p-3 border-2 border-purple-300 rounded-xl text-lg focus:border-purple-500 focus:outline-none',
+            placeholder: 'Enter your name here'
+          })
+        ),
+        
+        React.createElement('button', {
+          onClick: () => playerName.trim() && setCurrentScreen('menu'),
+          disabled: !playerName.trim(),
+          className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors'
+        }, 'Let\'s Start! 🚀')
+      )
     );
   }
 
   // Main Menu Screen
   if (currentScreen === 'menu') {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-400 to-pink-400 p-4">
-        <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-3xl p-6 shadow-2xl mb-4">
-            <div className="text-center mb-4">
-              <h2 className="text-2xl font-bold text-purple-600">Hi {playerName}! 👋</h2>
-              <div className="flex justify-center items-center mt-2">
-                <Star className="text-yellow-500 mr-2" size={24} />
-                <span className="text-xl font-bold text-yellow-600">{totalPoints} points</span>
-              </div>
-            </div>
-          </div>
+    return React.createElement('div', {
+      className: 'min-h-screen bg-gradient-to-b from-purple-400 to-pink-400 p-4'
+    },
+      React.createElement('div', { className: 'max-w-md mx-auto' },
+        React.createElement('div', { className: 'bg-white rounded-3xl p-6 shadow-2xl mb-4' },
+          React.createElement('div', { className: 'text-center mb-4' },
+            React.createElement('h2', { className: 'text-2xl font-bold text-purple-600' }, `Hi ${playerName}! 👋`),
+            React.createElement('div', { className: 'flex justify-center items-center mt-2' },
+              React.createElement(StarIcon),
+              React.createElement('span', { className: 'text-xl font-bold text-yellow-600 ml-2' }, `${totalPoints} points`)
+            )
+          )
+        ),
 
-          <div className="space-y-4">
-            <button
-              onClick={() => setCurrentScreen('game')}
-              className="w-full bg-green-500 text-white p-4 rounded-2xl text-xl font-bold hover:bg-green-600 transition-colors flex items-center justify-center"
-            >
-              <Play className="mr-3" size={24} />
-              Play Quiz - Level {currentLevel}
-            </button>
+        React.createElement('div', { className: 'space-y-4' },
+          React.createElement('button', {
+            onClick: () => setCurrentScreen('game'),
+            className: 'w-full bg-green-500 text-white p-4 rounded-2xl text-xl font-bold hover:bg-green-600 transition-colors flex items-center justify-center'
+          },
+            React.createElement(PlayIcon),
+            React.createElement('span', { className: 'ml-3' }, `Play Quiz - Level ${currentLevel}`)
+          ),
 
-            <button
-              onClick={() => setCurrentScreen('shop')}
-              className="w-full bg-blue-500 text-white p-4 rounded-2xl text-xl font-bold hover:bg-blue-600 transition-colors flex items-center justify-center"
-            >
-              <Award className="mr-3" size={24} />
-              Sticker Shop
-            </button>
+          React.createElement('button', {
+            onClick: () => setCurrentScreen('shop'),
+            className: 'w-full bg-blue-500 text-white p-4 rounded-2xl text-xl font-bold hover:bg-blue-600 transition-colors flex items-center justify-center'
+          },
+            React.createElement(AwardIcon),
+            React.createElement('span', { className: 'ml-3' }, 'Sticker Shop')
+          ),
 
-            <button
-              onClick={() => setCurrentScreen('stickers')}
-              className="w-full bg-pink-500 text-white p-4 rounded-2xl text-xl font-bold hover:bg-pink-600 transition-colors flex items-center justify-center"
-            >
-              <Book className="mr-3" size={24} />
-              My Sticker Book ({stickerBook.length})
-            </button>
-          </div>
-        </div>
-      </div>
+          React.createElement('button', {
+            onClick: () => setCurrentScreen('stickers'),
+            className: 'w-full bg-pink-500 text-white p-4 rounded-2xl text-xl font-bold hover:bg-pink-600 transition-colors flex items-center justify-center'
+          },
+            React.createElement(BookIcon),
+            React.createElement('span', { className: 'ml-3' }, `My Sticker Book (${stickerBook.length})`)
+          )
+        )
+      )
     );
   }
 
@@ -204,192 +235,179 @@ const AnimalQuizApp = () => {
 
     if (showResult) {
       const passed = score >= 7;
-      return (
-        <div className="min-h-screen bg-gradient-to-b from-yellow-400 to-orange-400 flex flex-col items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 shadow-2xl max-w-md w-full text-center">
-            <div className="text-6xl mb-4">{passed ? "🎉" : "😊"}</div>
-            <h2 className="text-3xl font-bold mb-4 text-purple-600">
-              {passed ? "Awesome Job!" : "Good Try!"}
-            </h2>
-            <p className="text-xl mb-4">You got {score} out of 10 questions right!</p>
-            <p className="text-lg mb-6 text-green-600 font-semibold">
-              You earned {currentLevel * 2 * score} points! ⭐
-            </p>
+      return React.createElement('div', {
+        className: 'min-h-screen bg-gradient-to-b from-yellow-400 to-orange-400 flex flex-col items-center justify-center p-4'
+      },
+        React.createElement('div', { className: 'bg-white rounded-3xl p-8 shadow-2xl max-w-md w-full text-center' },
+          React.createElement('div', { className: 'text-6xl mb-4' }, passed ? "🎉" : "😊"),
+          React.createElement('h2', { className: 'text-3xl font-bold mb-4 text-purple-600' }, 
+            passed ? "Awesome Job!" : "Good Try!"
+          ),
+          React.createElement('p', { className: 'text-xl mb-4' }, `You got ${score} out of 10 questions right!`),
+          React.createElement('p', { className: 'text-lg mb-6 text-green-600 font-semibold' }, 
+            `You earned ${currentLevel * 2 * score} points! ⭐`
+          ),
+          
+          React.createElement('div', { className: 'space-y-3' },
+            passed ? (
+              React.createElement('button', {
+                onClick: nextLevel,
+                className: 'w-full bg-green-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-green-600 transition-colors'
+              }, 'Next Level! 🚀')
+            ) : (
+              React.createElement('button', {
+                onClick: restartLevel,
+                className: 'w-full bg-blue-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-blue-600 transition-colors'
+              }, 'Try Again! 💪')
+            ),
             
-            <div className="space-y-3">
-              {passed ? (
-                <button
-                  onClick={nextLevel}
-                  className="w-full bg-green-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-green-600 transition-colors"
-                >
-                  Next Level! 🚀
-                </button>
-              ) : (
-                <button
-                  onClick={restartLevel}
-                  className="w-full bg-blue-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-blue-600 transition-colors"
-                >
-                  Try Again! 💪
-                </button>
-              )}
-              
-              <button
-                onClick={() => setCurrentScreen('menu')}
-                className="w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 transition-colors"
-              >
-                Back to Menu
-              </button>
-            </div>
-          </div>
-        </div>
+            React.createElement('button', {
+              onClick: () => setCurrentScreen('menu'),
+              className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 transition-colors'
+            }, 'Back to Menu')
+          )
+        )
       );
     }
 
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-green-400 to-blue-400 p-4">
-        <div className="max-w-md mx-auto">
-          {/* Header */}
-          <div className="bg-white rounded-2xl p-4 mb-4 shadow-lg">
-            <div className="flex justify-between items-center">
-              <span className="text-purple-600 font-bold">Level {currentLevel}</span>
-              <span className="text-purple-600 font-bold">Question {currentQuestion + 1}/10</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-3 mt-2">
-              <div 
-                className="bg-purple-500 h-3 rounded-full transition-all duration-300"
-                style={{ width: `${((currentQuestion + 1) / 10) * 100}%` }}
-              ></div>
-            </div>
-          </div>
+    return React.createElement('div', {
+      className: 'min-h-screen bg-gradient-to-b from-green-400 to-blue-400 p-4'
+    },
+      React.createElement('div', { className: 'max-w-md mx-auto' },
+        // Header
+        React.createElement('div', { className: 'bg-white rounded-2xl p-4 mb-4 shadow-lg' },
+          React.createElement('div', { className: 'flex justify-between items-center' },
+            React.createElement('span', { className: 'text-purple-600 font-bold' }, `Level ${currentLevel}`),
+            React.createElement('span', { className: 'text-purple-600 font-bold' }, `Question ${currentQuestion + 1}/10`)
+          ),
+          React.createElement('div', { className: 'w-full bg-gray-200 rounded-full h-3 mt-2' },
+            React.createElement('div', {
+              className: 'bg-purple-500 h-3 rounded-full transition-all duration-300',
+              style: { width: `${((currentQuestion + 1) / 10) * 100}%` }
+            })
+          )
+        ),
 
-          {/* Question */}
-          <div className="bg-white rounded-3xl p-6 shadow-2xl">
-            <div className="text-center mb-6">
-              <div className="text-6xl mb-4">{currentQ.image}</div>
-              <h3 className="text-xl font-bold text-purple-600">{currentQ.question}</h3>
-            </div>
+        // Question
+        React.createElement('div', { className: 'bg-white rounded-3xl p-6 shadow-2xl' },
+          React.createElement('div', { className: 'text-center mb-6' },
+            React.createElement('div', { className: 'text-6xl mb-4' }, currentQ.image),
+            React.createElement('h3', { className: 'text-xl font-bold text-purple-600' }, currentQ.question)
+          ),
 
-            <div className="space-y-3">
-              {currentQ.options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleAnswerSelect(index)}
-                  disabled={selectedAnswer !== null}
-                  className={`w-full p-4 rounded-xl text-lg font-semibold transition-all ${
-                    selectedAnswer === null
-                      ? 'bg-purple-100 hover:bg-purple-200 text-purple-700'
-                      : selectedAnswer === index
-                        ? index === currentQ.correct
-                          ? 'bg-green-500 text-white'
-                          : 'bg-red-500 text-white'
-                        : index === currentQ.correct
-                          ? 'bg-green-500 text-white'
-                          : 'bg-gray-200 text-gray-500'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+          React.createElement('div', { className: 'space-y-3' },
+            ...currentQ.options.map((option, index) =>
+              React.createElement('button', {
+                key: index,
+                onClick: () => handleAnswerSelect(index),
+                disabled: selectedAnswer !== null,
+                className: `w-full p-4 rounded-xl text-lg font-semibold transition-all ${
+                  selectedAnswer === null
+                    ? 'bg-purple-100 hover:bg-purple-200 text-purple-700'
+                    : selectedAnswer === index
+                      ? index === currentQ.correct
+                        ? 'bg-green-500 text-white'
+                        : 'bg-red-500 text-white'
+                      : index === currentQ.correct
+                        ? 'bg-green-500 text-white'
+                        : 'bg-gray-200 text-gray-500'
+                }`
+              }, option)
+            )
+          )
+        )
+      )
     );
   }
 
   // Shop Screen
   if (currentScreen === 'shop') {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-pink-400 to-purple-400 p-4">
-        <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-2xl p-4 mb-4 shadow-lg">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-purple-600">Sticker Shop</h2>
-              <div className="flex items-center">
-                <Star className="text-yellow-500 mr-1" size={20} />
-                <span className="font-bold text-yellow-600">{totalPoints}</span>
-              </div>
-            </div>
-          </div>
+    return React.createElement('div', {
+      className: 'min-h-screen bg-gradient-to-b from-pink-400 to-purple-400 p-4'
+    },
+      React.createElement('div', { className: 'max-w-md mx-auto' },
+        React.createElement('div', { className: 'bg-white rounded-2xl p-4 mb-4 shadow-lg' },
+          React.createElement('div', { className: 'flex justify-between items-center' },
+            React.createElement('h2', { className: 'text-xl font-bold text-purple-600' }, 'Sticker Shop'),
+            React.createElement('div', { className: 'flex items-center' },
+              React.createElement(StarIcon),
+              React.createElement('span', { className: 'font-bold text-yellow-600 ml-1' }, totalPoints)
+            )
+          )
+        ),
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            {availableStickers.map(sticker => (
-              <div key={sticker.id} className="bg-white rounded-2xl p-4 shadow-lg">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">{sticker.emoji}</div>
-                  <h3 className="font-semibold text-purple-600 mb-2">{sticker.name}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{sticker.cost} points</p>
-                  <button
-                    onClick={() => buySticker(sticker)}
-                    disabled={totalPoints < sticker.cost || stickerBook.some(s => s.id === sticker.id)}
-                    className={`w-full py-2 px-3 rounded-lg font-semibold text-sm ${
-                      stickerBook.some(s => s.id === sticker.id)
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                        : totalPoints >= sticker.cost
-                          ? 'bg-green-500 text-white hover:bg-green-600'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    {stickerBook.some(s => s.id === sticker.id) ? 'Owned' : 'Buy'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+        React.createElement('div', { className: 'grid grid-cols-2 gap-4 mb-4' },
+          ...availableStickers.map(sticker =>
+            React.createElement('div', { key: sticker.id, className: 'bg-white rounded-2xl p-4 shadow-lg' },
+              React.createElement('div', { className: 'text-center' },
+                React.createElement('div', { className: 'text-4xl mb-2' }, sticker.emoji),
+                React.createElement('h3', { className: 'font-semibold text-purple-600 mb-2' }, sticker.name),
+                React.createElement('p', { className: 'text-sm text-gray-600 mb-3' }, `${sticker.cost} points`),
+                React.createElement('button', {
+                  onClick: () => buySticker(sticker),
+                  disabled: totalPoints < sticker.cost || stickerBook.some(s => s.id === sticker.id),
+                  className: `w-full py-2 px-3 rounded-lg font-semibold text-sm ${
+                    stickerBook.some(s => s.id === sticker.id)
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : totalPoints >= sticker.cost
+                        ? 'bg-green-500 text-white hover:bg-green-600'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`
+                }, stickerBook.some(s => s.id === sticker.id) ? 'Owned' : 'Buy')
+              )
+            )
+          )
+        ),
 
-          <button
-            onClick={() => setCurrentScreen('menu')}
-            className="w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 transition-colors"
-          >
-            Back to Menu
-          </button>
-        </div>
-      </div>
+        React.createElement('button', {
+          onClick: () => setCurrentScreen('menu'),
+          className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 transition-colors'
+        }, 'Back to Menu')
+      )
     );
   }
 
   // Sticker Book Screen
   if (currentScreen === 'stickers') {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-400 to-green-400 p-4">
-        <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-2xl p-4 mb-4 shadow-lg">
-            <h2 className="text-xl font-bold text-purple-600 text-center">
-              {playerName}'s Sticker Book 📚
-            </h2>
-          </div>
+    return React.createElement('div', {
+      className: 'min-h-screen bg-gradient-to-b from-blue-400 to-green-400 p-4'
+    },
+      React.createElement('div', { className: 'max-w-md mx-auto' },
+        React.createElement('div', { className: 'bg-white rounded-2xl p-4 mb-4 shadow-lg' },
+          React.createElement('h2', { className: 'text-xl font-bold text-purple-600 text-center' }, 
+            `${playerName}'s Sticker Book 📚`
+          )
+        ),
 
-          {stickerBook.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-              <div className="text-4xl mb-4">📖</div>
-              <p className="text-gray-600 mb-4">Your sticker book is empty!</p>
-              <p className="text-sm text-gray-500">Play quizzes to earn points and buy stickers!</p>
-            </div>
-          ) : (
-            <div className="bg-white rounded-2xl p-4 mb-4 shadow-lg">
-              <div className="grid grid-cols-3 gap-4">
-                {stickerBook.map((sticker, index) => (
-                  <div key={index} className="text-center p-3 bg-yellow-100 rounded-xl">
-                    <div className="text-3xl mb-1">{sticker.emoji}</div>
-                    <p className="text-xs font-semibold text-purple-600">{sticker.name}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        stickerBook.length === 0 ? (
+          React.createElement('div', { className: 'bg-white rounded-2xl p-8 shadow-lg text-center' },
+            React.createElement('div', { className: 'text-4xl mb-4' }, '📖'),
+            React.createElement('p', { className: 'text-gray-600 mb-4' }, 'Your sticker book is empty!'),
+            React.createElement('p', { className: 'text-sm text-gray-500' }, 'Play quizzes to earn points and buy stickers!')
+          )
+        ) : (
+          React.createElement('div', { className: 'bg-white rounded-2xl p-4 mb-4 shadow-lg' },
+            React.createElement('div', { className: 'grid grid-cols-3 gap-4' },
+              ...stickerBook.map((sticker, index) =>
+                React.createElement('div', { key: index, className: 'text-center p-3 bg-yellow-100 rounded-xl' },
+                  React.createElement('div', { className: 'text-3xl mb-1' }, sticker.emoji),
+                  React.createElement('p', { className: 'text-xs font-semibold text-purple-600' }, sticker.name)
+                )
+              )
+            )
+          )
+        ),
 
-          <button
-            onClick={() => setCurrentScreen('menu')}
-            className="w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 transition-colors"
-          >
-            Back to Menu
-          </button>
-        </div>
-      </div>
+        React.createElement('button', {
+          onClick: () => setCurrentScreen('menu'),
+          className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 transition-colors'
+        }, 'Back to Menu')
+      )
     );
   }
 
   return null;
 };
 
-export default AnimalQuizApp;
+// Render the app
+ReactDOM.render(React.createElement(AnimalQuizApp), document.getElementById('root'));
