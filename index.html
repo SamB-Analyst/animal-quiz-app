@@ -5,68 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Animal Facts Quiz</title>
     
-    <!-- React and ReactDOM (production versions) -->
+    <!-- React Production -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Mobile app meta tags -->
+    <!-- Mobile Meta -->
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Animal Quiz">
     <meta name="theme-color" content="#8B5CF6">
     
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
-        }
-        
-        * {
-            box-sizing: border-box;
-        }
-        
-        button {
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        input {
-            font-size: 16px;
-        }
-        
-        #root {
-            min-height: 100vh;
-        }
-        
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-size: 24px;
-            color: #8B5CF6;
-        }
+        body { margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+        * { box-sizing: border-box; }
+        #root { min-height: 100vh; }
+        .loading { display: flex; justify-content: center; align-items: center; min-height: 100vh; font-size: 24px; }
     </style>
 </head>
 <body>
     <div id="root">
-        <div class="loading">
-            <div>🦁 Loading Animal Quiz... 🦒</div>
-        </div>
+        <div class="loading">🦁 Loading... 🦒</div>
     </div>
     
+    <!-- NO EXTERNAL SCRIPT FILES - Everything is inline below -->
     <script>
-        // Use React without JSX/Babel to avoid exports errors
         const { useState } = React;
         const e = React.createElement;
 
-        // Icon components using emojis
         const StarIcon = () => e('span', { className: 'inline-block text-yellow-500' }, '⭐');
         const PlayIcon = () => e('span', { className: 'inline-block' }, '▶️');
         const AwardIcon = () => e('span', { className: 'inline-block' }, '🏅');
@@ -83,7 +49,6 @@
             const [selectedAnswer, setSelectedAnswer] = useState(null);
             const [stickerBook, setStickerBook] = useState([]);
 
-            // Quiz data
             const quizData = {
                 1: [
                     { question: "What sound does a cow make?", options: ["Meow", "Moo", "Bark", "Roar"], correct: 1, image: "🐄" },
@@ -117,9 +82,7 @@
                 { id: 3, emoji: "🦁", name: "Brave Lion", cost: 15 },
                 { id: 4, emoji: "🐘", name: "Wise Elephant", cost: 20 },
                 { id: 5, emoji: "🦒", name: "Tall Giraffe", cost: 15 },
-                { id: 6, emoji: "🐼", name: "Cuddly Panda", cost: 25 },
-                { id: 7, emoji: "🦋", name: "Pretty Butterfly", cost: 12 },
-                { id: 8, emoji: "🐠", name: "Colorful Fish", cost: 8 }
+                { id: 6, emoji: "🐼", name: "Cuddly Panda", cost: 25 }
             ];
 
             const handleAnswerSelect = (answerIndex) => {
@@ -146,7 +109,7 @@
             };
 
             const buySticker = (sticker) => {
-                if (totalPoints >= sticker.cost) {
+                if (totalPoints >= sticker.cost && !stickerBook.some(s => s.id === sticker.id)) {
                     setTotalPoints(totalPoints - sticker.cost);
                     setStickerBook([...stickerBook, sticker]);
                 }
@@ -179,7 +142,7 @@
                     },
                         e('div', { className: 'text-6xl mb-4' }, '🦁🐘🦒'),
                         e('h1', { className: 'text-3xl font-bold text-purple-600 mb-4' }, 'Animal Facts Quiz!'),
-                        e('p', { className: 'text-gray-600 mb-6' }, 'Learn amazing facts about animals while having fun!'),
+                        e('p', { className: 'text-gray-600 mb-6' }, 'Learn amazing facts about animals!'),
                         
                         e('div', { className: 'mb-6' },
                             e('label', { className: 'block text-left text-purple-600 font-semibold mb-2' }, 'What\'s your name?'),
@@ -188,20 +151,20 @@
                                 value: playerName,
                                 onChange: (event) => setPlayerName(event.target.value),
                                 className: 'w-full p-3 border-2 border-purple-300 rounded-xl text-lg focus:border-purple-500 focus:outline-none',
-                                placeholder: 'Enter your name here'
+                                placeholder: 'Enter your name'
                             })
                         ),
                         
                         e('button', {
                             onClick: () => playerName.trim() && setCurrentScreen('menu'),
                             disabled: !playerName.trim(),
-                            className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors'
+                            className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 disabled:bg-gray-300 transition-colors'
                         }, 'Let\'s Start! 🚀')
                     )
                 );
             }
 
-            // Main Menu Screen
+            // Menu Screen
             if (currentScreen === 'menu') {
                 return e('div', {
                     className: 'min-h-screen bg-gradient-to-b from-purple-400 to-pink-400 p-4'
@@ -292,7 +255,6 @@
                     className: 'min-h-screen bg-gradient-to-b from-green-400 to-blue-400 p-4'
                 },
                     e('div', { className: 'max-w-md mx-auto' },
-                        // Header
                         e('div', { className: 'bg-white rounded-2xl p-4 mb-4 shadow-lg' },
                             e('div', { className: 'flex justify-between items-center' },
                                 e('span', { className: 'text-purple-600 font-bold' }, `Level ${currentLevel}`),
@@ -306,7 +268,6 @@
                             )
                         ),
 
-                        // Question
                         e('div', { className: 'bg-white rounded-3xl p-6 shadow-2xl' },
                             e('div', { className: 'text-center mb-6' },
                                 e('div', { className: 'text-6xl mb-4' }, currentQ.image),
@@ -366,10 +327,10 @@
                                             disabled: totalPoints < sticker.cost || stickerBook.some(s => s.id === sticker.id),
                                             className: `w-full py-2 px-3 rounded-lg font-semibold text-sm ${
                                                 stickerBook.some(s => s.id === sticker.id)
-                                                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                                    ? 'bg-gray-200 text-gray-500'
                                                     : totalPoints >= sticker.cost
                                                         ? 'bg-green-500 text-white hover:bg-green-600'
-                                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                        : 'bg-gray-300 text-gray-500'
                                             }`
                                         }, stickerBook.some(s => s.id === sticker.id) ? 'Owned' : 'Buy')
                                     )
