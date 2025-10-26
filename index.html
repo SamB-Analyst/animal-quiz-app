@@ -3,393 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Facts Quiz</title>
-    
+    <title>Ugly Sweater Holiday Party!</title>
+
     <!-- React Production -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
+    <!-- html2canvas for screenshot -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
     <!-- Mobile Meta -->
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#8B5CF6">
-    
+    <meta name="theme-color" content="#DC2626">
+
     <style>
-        body { margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+        body { margin: 0; padding: 0; font-family: system-ui, sans-serif; overflow-x: hidden; }
         * { box-sizing: border-box; }
         #root { min-height: 100vh; }
-        .loading { display: flex; justify-content: center; align-items: center; min-height: 100vh; font-size: 24px; }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0.8; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(220, 38, 38, 0.8); }
+        }
+
+        .snowflake {
+            position: fixed;
+            top: -10vh;
+            color: white;
+            font-size: 1.5em;
+            opacity: 0.8;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .bounce-animation {
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .wiggle-animation {
+            animation: wiggle 1s ease-in-out infinite;
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .sweater-pattern {
+            background: linear-gradient(45deg, #DC2626 25%, #16A34A 25%, #16A34A 50%, #DC2626 50%, #DC2626 75%, #16A34A 75%, #16A34A);
+            background-size: 40px 40px;
+        }
+
+        @media print {
+            .no-print { display: none; }
+        }
     </style>
 </head>
 <body>
-    <div id="root">
-        <div class="loading">🦁 Loading... 🦒</div>
-    </div>
-    
-    <!-- NO EXTERNAL SCRIPT FILES - Everything is inline below -->
+    <div id="root"></div>
+
     <script>
-        const { useState } = React;
+        const { useState, useEffect } = React;
         const e = React.createElement;
 
-        const StarIcon = () => e('span', { className: 'inline-block text-yellow-500' }, '⭐');
-        const PlayIcon = () => e('span', { className: 'inline-block' }, '▶️');
-        const AwardIcon = () => e('span', { className: 'inline-block' }, '🏅');
-        const BookIcon = () => e('span', { className: 'inline-block' }, '📚');
+        const Snowflake = ({ delay, duration, left }) => {
+            return e('div', {
+                className: 'snowflake',
+                style: {
+                    left: `${left}%`,
+                    animationDelay: `${delay}s`,
+                    animationDuration: `${duration}s`
+                }
+            }, '❄️');
+        };
 
-        const AnimalQuizApp = () => {
-            const [currentScreen, setCurrentScreen] = useState('welcome');
-            const [playerName, setPlayerName] = useState('');
-            const [currentLevel, setCurrentLevel] = useState(1);
-            const [currentQuestion, setCurrentQuestion] = useState(0);
-            const [score, setScore] = useState(0);
-            const [totalPoints, setTotalPoints] = useState(100);
-            const [showResult, setShowResult] = useState(false);
-            const [selectedAnswer, setSelectedAnswer] = useState(null);
-            const [stickerBook, setStickerBook] = useState([]);
+        const UglySweaterParty = () => {
+            const [rsvpStatus, setRsvpStatus] = useState(null);
+            const [guestName, setGuestName] = useState('');
+            const [downloading, setDownloading] = useState(false);
 
-            const quizData = {
-                1: [
-                    { question: "What sound does a cow make?", options: ["Meow", "Moo", "Bark", "Roar"], correct: 1, image: "🐄" },
-                    { question: "Which animal is the king of the jungle?", options: ["Elephant", "Tiger", "Lion", "Bear"], correct: 2, image: "🦁" },
-                    { question: "What do cats like to drink?", options: ["Coffee", "Milk", "Juice", "Soda"], correct: 1, image: "🐱" },
-                    { question: "Which animal hops?", options: ["Dog", "Rabbit", "Fish", "Bird"], correct: 1, image: "🐰" },
-                    { question: "What color is a zebra?", options: ["Blue", "Red", "Black and white", "Green"], correct: 2, image: "🦓" },
-                    { question: "Which animal lives in water?", options: ["Cat", "Dog", "Fish", "Rabbit"], correct: 2, image: "🐠" },
-                    { question: "What do bees make?", options: ["Milk", "Honey", "Eggs", "Butter"], correct: 1, image: "🐝" },
-                    { question: "Which animal is very tall?", options: ["Mouse", "Ant", "Giraffe", "Frog"], correct: 2, image: "🦒" },
-                    { question: "What do birds use to fly?", options: ["Legs", "Wings", "Tail", "Nose"], correct: 1, image: "🐦" },
-                    { question: "Which animal gives us wool?", options: ["Cow", "Pig", "Sheep", "Horse"], correct: 2, image: "🐑" }
-                ],
-                2: [
-                    { question: "How many legs does a spider have?", options: ["6", "8", "10", "4"], correct: 1, image: "🕷️" },
-                    { question: "Which animal changes colors?", options: ["Dog", "Chameleon", "Cat", "Horse"], correct: 1, image: "🦎" },
-                    { question: "What do pandas eat?", options: ["Meat", "Bamboo", "Fish", "Berries"], correct: 1, image: "🐼" },
-                    { question: "Which bird cannot fly?", options: ["Eagle", "Penguin", "Sparrow", "Owl"], correct: 1, image: "🐧" },
-                    { question: "How many humps does a camel have?", options: ["1 or 2", "3", "4", "5"], correct: 0, image: "🐪" },
-                    { question: "Which animal is known for being slow?", options: ["Cheetah", "Rabbit", "Turtle", "Horse"], correct: 2, image: "🐢" },
-                    { question: "What do elephants use to pick things up?", options: ["Trunk", "Tail", "Ears", "Feet"], correct: 0, image: "🐘" },
-                    { question: "Which animal sleeps upside down?", options: ["Cat", "Bat", "Dog", "Fish"], correct: 1, image: "🦇" },
-                    { question: "What type of animal is a dolphin?", options: ["Fish", "Mammal", "Bird", "Reptile"], correct: 1, image: "🐬" },
-                    { question: "Which animal has a pouch?", options: ["Lion", "Kangaroo", "Tiger", "Bear"], correct: 1, image: "🦘" }
-                ]
+            // Generate snowflakes
+            const snowflakes = Array.from({ length: 30 }, (_, i) => ({
+                id: i,
+                delay: Math.random() * 5,
+                duration: 8 + Math.random() * 7,
+                left: Math.random() * 100
+            }));
+
+            const handleDownload = async () => {
+                setDownloading(true);
+                try {
+                    const element = document.getElementById('invitation-card');
+                    const canvas = await html2canvas(element, {
+                        scale: 2,
+                        backgroundColor: '#1e40af',
+                        logging: false
+                    });
+
+                    const link = document.createElement('a');
+                    link.download = 'ugly-sweater-party-invite.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                } catch (error) {
+                    alert('Download failed. Please try taking a screenshot instead!');
+                }
+                setDownloading(false);
             };
 
-            const availableStickers = [
-                { id: 1, emoji: "🐶", name: "Happy Dog", cost: 10 },
-                { id: 2, emoji: "🐱", name: "Cute Cat", cost: 10 },
-                { id: 3, emoji: "🦁", name: "Brave Lion", cost: 15 },
-                { id: 4, emoji: "🐘", name: "Wise Elephant", cost: 20 },
-                { id: 5, emoji: "🦒", name: "Tall Giraffe", cost: 15 },
-                { id: 6, emoji: "🐼", name: "Cuddly Panda", cost: 25 }
-            ];
+            const handleShare = async () => {
+                const text = `You're Invited to our Ugly Sweater Holiday Party!\n\nDate: December 6th at 3pm\nLocation: 3356 New Castle Drive\nTheme: Ugly Sweater Party\n\nPlease bring a finger food to share!\n\nSee you there!`;
 
-            const handleAnswerSelect = (answerIndex) => {
-                setSelectedAnswer(answerIndex);
-                const isCorrect = answerIndex === getCurrentQuestions()[currentQuestion].correct;
-                
-                setTimeout(() => {
-                    if (isCorrect) {
-                        setScore(score + 1);
-                        setTotalPoints(totalPoints + (currentLevel * 2));
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'Ugly Sweater Holiday Party',
+                            text: text
+                        });
+                    } catch (error) {
+                        copyToClipboard(text);
                     }
-                    
-                    if (currentQuestion < 9) {
-                        setCurrentQuestion(currentQuestion + 1);
-                        setSelectedAnswer(null);
-                    } else {
-                        setShowResult(true);
-                    }
-                }, 1500);
-            };
-
-            const getCurrentQuestions = () => {
-                return quizData[Math.min(currentLevel, 2)] || quizData[2];
-            };
-
-            const buySticker = (sticker) => {
-                if (totalPoints >= sticker.cost && !stickerBook.some(s => s.id === sticker.id)) {
-                    setTotalPoints(totalPoints - sticker.cost);
-                    setStickerBook([...stickerBook, sticker]);
+                } else {
+                    copyToClipboard(text);
                 }
             };
 
-            const nextLevel = () => {
-                setCurrentLevel(currentLevel + 1);
-                setCurrentQuestion(0);
-                setScore(0);
-                setShowResult(false);
-                setSelectedAnswer(null);
-                setCurrentScreen('game');
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Party details copied to clipboard! Paste into your text message.');
+                }).catch(() => {
+                    alert('Please manually copy the party details from the card.');
+                });
             };
 
-            const restartLevel = () => {
-                setCurrentQuestion(0);
-                setScore(0);
-                setShowResult(false);
-                setSelectedAnswer(null);
-                setCurrentScreen('game');
-            };
+            return e('div', {
+                className: 'min-h-screen bg-gradient-to-b from-blue-800 via-blue-900 to-blue-950 relative overflow-hidden'
+            },
+                // Snowflakes
+                ...snowflakes.map(flake =>
+                    e(Snowflake, {
+                        key: flake.id,
+                        delay: flake.delay,
+                        duration: flake.duration,
+                        left: flake.left
+                    })
+                ),
 
-            // Welcome Screen
-            if (currentScreen === 'welcome') {
-                return e('div', {
-                    className: 'min-h-screen bg-gradient-to-b from-blue-400 to-green-400 flex flex-col items-center justify-center p-4'
-                }, 
-                    e('div', {
-                        className: 'bg-white rounded-3xl p-8 shadow-2xl max-w-md w-full text-center'
-                    },
-                        e('div', { className: 'text-6xl mb-4' }, '🦁🐘🦒'),
-                        e('h1', { className: 'text-3xl font-bold text-purple-600 mb-4' }, 'Animal Facts Quiz!'),
-                        e('p', { className: 'text-gray-600 mb-6' }, 'Learn amazing facts about animals!'),
-                        
-                        e('div', { className: 'mb-6' },
-                            e('label', { className: 'block text-left text-purple-600 font-semibold mb-2' }, 'What\'s your name?'),
-                            e('input', {
-                                type: 'text',
-                                value: playerName,
-                                onChange: (event) => setPlayerName(event.target.value),
-                                className: 'w-full p-3 border-2 border-purple-300 rounded-xl text-lg focus:border-purple-500 focus:outline-none',
-                                placeholder: 'Enter your name'
-                            })
-                        ),
-                        
-                        e('button', {
-                            onClick: () => playerName.trim() && setCurrentScreen('menu'),
-                            disabled: !playerName.trim(),
-                            className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 disabled:bg-gray-300 transition-colors'
-                        }, 'Let\'s Start! 🚀')
-                    )
-                );
-            }
-
-            // Menu Screen
-            if (currentScreen === 'menu') {
-                return e('div', {
-                    className: 'min-h-screen bg-gradient-to-b from-purple-400 to-pink-400 p-4'
-                },
-                    e('div', { className: 'max-w-md mx-auto' },
-                        e('div', { className: 'bg-white rounded-3xl p-6 shadow-2xl mb-4' },
-                            e('div', { className: 'text-center mb-4' },
-                                e('h2', { className: 'text-2xl font-bold text-purple-600' }, `Hi ${playerName}! 👋`),
-                                e('div', { className: 'flex justify-center items-center mt-2' },
-                                    e(StarIcon),
-                                    e('span', { className: 'text-xl font-bold text-yellow-600 ml-2' }, `${totalPoints} points`)
-                                )
-                            )
-                        ),
-
-                        e('div', { className: 'space-y-4' },
-                            e('button', {
-                                onClick: () => setCurrentScreen('game'),
-                                className: 'w-full bg-green-500 text-white p-4 rounded-2xl text-xl font-bold hover:bg-green-600 transition-colors flex items-center justify-center'
-                            },
-                                e(PlayIcon),
-                                e('span', { className: 'ml-3' }, `Play Quiz - Level ${currentLevel}`)
+                // Main Content
+                e('div', { className: 'relative z-10 min-h-screen flex items-center justify-center p-4' },
+                    e('div', { className: 'max-w-2xl w-full' },
+                        // Invitation Card
+                        e('div', {
+                            id: 'invitation-card',
+                            className: 'bg-white rounded-3xl shadow-2xl overflow-hidden mb-6'
+                        },
+                            // Header with ugly sweater pattern
+                            e('div', { className: 'sweater-pattern p-8 text-center relative' },
+                                e('div', { className: 'bounce-animation inline-block text-6xl mb-4' }, '🎄'),
+                                e('h1', {
+                                    className: 'text-5xl font-black text-white mb-2',
+                                    style: { textShadow: '3px 3px 6px rgba(0,0,0,0.5)' }
+                                }, 'YOU\'RE INVITED!'),
+                                e('div', { className: 'wiggle-animation inline-block text-6xl mt-4' }, '🎅')
                             ),
 
-                            e('button', {
-                                onClick: () => setCurrentScreen('shop'),
-                                className: 'w-full bg-blue-500 text-white p-4 rounded-2xl text-xl font-bold hover:bg-blue-600 transition-colors flex items-center justify-center'
-                            },
-                                e(AwardIcon),
-                                e('span', { className: 'ml-3' }, 'Sticker Shop')
-                            ),
-
-                            e('button', {
-                                onClick: () => setCurrentScreen('stickers'),
-                                className: 'w-full bg-pink-500 text-white p-4 rounded-2xl text-xl font-bold hover:bg-pink-600 transition-colors flex items-center justify-center'
-                            },
-                                e(BookIcon),
-                                e('span', { className: 'ml-3' }, `My Sticker Book (${stickerBook.length})`)
-                            )
-                        )
-                    )
-                );
-            }
-
-            // Game Screen
-            if (currentScreen === 'game') {
-                const questions = getCurrentQuestions();
-                const currentQ = questions[currentQuestion];
-
-                if (showResult) {
-                    const passed = score >= 7;
-                    return e('div', {
-                        className: 'min-h-screen bg-gradient-to-b from-yellow-400 to-orange-400 flex flex-col items-center justify-center p-4'
-                    },
-                        e('div', { className: 'bg-white rounded-3xl p-8 shadow-2xl max-w-md w-full text-center' },
-                            e('div', { className: 'text-6xl mb-4' }, passed ? "🎉" : "😊"),
-                            e('h2', { className: 'text-3xl font-bold mb-4 text-purple-600' }, 
-                                passed ? "Awesome Job!" : "Good Try!"
-                            ),
-                            e('p', { className: 'text-xl mb-4' }, `You got ${score} out of 10 questions right!`),
-                            e('p', { className: 'text-lg mb-6 text-green-600 font-semibold' }, 
-                                `You earned ${currentLevel * 2 * score} points! ⭐`
-                            ),
-                            
-                            e('div', { className: 'space-y-3' },
-                                passed ? (
-                                    e('button', {
-                                        onClick: nextLevel,
-                                        className: 'w-full bg-green-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-green-600 transition-colors'
-                                    }, 'Next Level! 🚀')
-                                ) : (
-                                    e('button', {
-                                        onClick: restartLevel,
-                                        className: 'w-full bg-blue-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-blue-600 transition-colors'
-                                    }, 'Try Again! 💪')
-                                ),
-                                
-                                e('button', {
-                                    onClick: () => setCurrentScreen('menu'),
-                                    className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 transition-colors'
-                                }, 'Back to Menu')
-                            )
-                        )
-                    );
-                }
-
-                return e('div', {
-                    className: 'min-h-screen bg-gradient-to-b from-green-400 to-blue-400 p-4'
-                },
-                    e('div', { className: 'max-w-md mx-auto' },
-                        e('div', { className: 'bg-white rounded-2xl p-4 mb-4 shadow-lg' },
-                            e('div', { className: 'flex justify-between items-center' },
-                                e('span', { className: 'text-purple-600 font-bold' }, `Level ${currentLevel}`),
-                                e('span', { className: 'text-purple-600 font-bold' }, `Question ${currentQuestion + 1}/10`)
-                            ),
-                            e('div', { className: 'w-full bg-gray-200 rounded-full h-3 mt-2' },
-                                e('div', {
-                                    className: 'bg-purple-500 h-3 rounded-full transition-all duration-300',
-                                    style: { width: `${((currentQuestion + 1) / 10) * 100}%` }
-                                })
-                            )
-                        ),
-
-                        e('div', { className: 'bg-white rounded-3xl p-6 shadow-2xl' },
-                            e('div', { className: 'text-center mb-6' },
-                                e('div', { className: 'text-6xl mb-4' }, currentQ.image),
-                                e('h3', { className: 'text-xl font-bold text-purple-600' }, currentQ.question)
-                            ),
-
-                            e('div', { className: 'space-y-3' },
-                                ...currentQ.options.map((option, index) =>
-                                    e('button', {
-                                        key: index,
-                                        onClick: () => handleAnswerSelect(index),
-                                        disabled: selectedAnswer !== null,
-                                        className: `w-full p-4 rounded-xl text-lg font-semibold transition-all ${
-                                            selectedAnswer === null
-                                                ? 'bg-purple-100 hover:bg-purple-200 text-purple-700'
-                                                : selectedAnswer === index
-                                                    ? index === currentQ.correct
-                                                        ? 'bg-green-500 text-white'
-                                                        : 'bg-red-500 text-white'
-                                                    : index === currentQ.correct
-                                                        ? 'bg-green-500 text-white'
-                                                        : 'bg-gray-200 text-gray-500'
-                                        }`
-                                    }, option)
-                                )
-                            )
-                        )
-                    )
-                );
-            }
-
-            // Shop Screen
-            if (currentScreen === 'shop') {
-                return e('div', {
-                    className: 'min-h-screen bg-gradient-to-b from-pink-400 to-purple-400 p-4'
-                },
-                    e('div', { className: 'max-w-md mx-auto' },
-                        e('div', { className: 'bg-white rounded-2xl p-4 mb-4 shadow-lg' },
-                            e('div', { className: 'flex justify-between items-center' },
-                                e('h2', { className: 'text-xl font-bold text-purple-600' }, 'Sticker Shop'),
-                                e('div', { className: 'flex items-center' },
-                                    e(StarIcon),
-                                    e('span', { className: 'font-bold text-yellow-600 ml-1' }, totalPoints)
-                                )
-                            )
-                        ),
-
-                        e('div', { className: 'grid grid-cols-2 gap-4 mb-4' },
-                            ...availableStickers.map(sticker =>
-                                e('div', { key: sticker.id, className: 'bg-white rounded-2xl p-4 shadow-lg' },
-                                    e('div', { className: 'text-center' },
-                                        e('div', { className: 'text-4xl mb-2' }, sticker.emoji),
-                                        e('h3', { className: 'font-semibold text-purple-600 mb-2' }, sticker.name),
-                                        e('p', { className: 'text-sm text-gray-600 mb-3' }, `${sticker.cost} points`),
-                                        e('button', {
-                                            onClick: () => buySticker(sticker),
-                                            disabled: totalPoints < sticker.cost || stickerBook.some(s => s.id === sticker.id),
-                                            className: `w-full py-2 px-3 rounded-lg font-semibold text-sm ${
-                                                stickerBook.some(s => s.id === sticker.id)
-                                                    ? 'bg-gray-200 text-gray-500'
-                                                    : totalPoints >= sticker.cost
-                                                        ? 'bg-green-500 text-white hover:bg-green-600'
-                                                        : 'bg-gray-300 text-gray-500'
-                                            }`
-                                        }, stickerBook.some(s => s.id === sticker.id) ? 'Owned' : 'Buy')
+                            // Main Content
+                            e('div', { className: 'p-8' },
+                                // Title
+                                e('div', { className: 'text-center mb-8' },
+                                    e('h2', { className: 'text-4xl font-bold text-red-600 mb-2' },
+                                        'Annual Holiday Party'
+                                    ),
+                                    e('div', { className: 'flex justify-center items-center gap-3 text-5xl mb-4' },
+                                        e('span', { className: 'wiggle-animation' }, '🧶'),
+                                        e('h3', { className: 'text-3xl font-bold text-green-600' },
+                                            'Ugly Sweater Edition'
+                                        ),
+                                        e('span', { className: 'wiggle-animation' }, '🧣')
                                     )
-                                )
-                            )
-                        ),
+                                ),
 
-                        e('button', {
-                            onClick: () => setCurrentScreen('menu'),
-                            className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 transition-colors'
-                        }, 'Back to Menu')
-                    )
-                );
-            }
+                                // Party Details
+                                e('div', { className: 'bg-gradient-to-r from-red-50 to-green-50 rounded-2xl p-6 mb-6' },
+                                    e('div', { className: 'space-y-4' },
+                                        // Date & Time
+                                        e('div', { className: 'flex items-center gap-4' },
+                                            e('div', { className: 'text-4xl' }, '📅'),
+                                            e('div', null,
+                                                e('p', { className: 'text-lg font-bold text-gray-800' }, 'When'),
+                                                e('p', { className: 'text-xl text-red-600 font-semibold' },
+                                                    'December 6th at 3:00 PM'
+                                                )
+                                            )
+                                        ),
 
-            // Sticker Book Screen
-            if (currentScreen === 'stickers') {
-                return e('div', {
-                    className: 'min-h-screen bg-gradient-to-b from-blue-400 to-green-400 p-4'
-                },
-                    e('div', { className: 'max-w-md mx-auto' },
-                        e('div', { className: 'bg-white rounded-2xl p-4 mb-4 shadow-lg' },
-                            e('h2', { className: 'text-xl font-bold text-purple-600 text-center' }, 
-                                `${playerName}'s Sticker Book 📚`
-                            )
-                        ),
+                                        // Location
+                                        e('div', { className: 'flex items-center gap-4' },
+                                            e('div', { className: 'text-4xl' }, '🏠'),
+                                            e('div', null,
+                                                e('p', { className: 'text-lg font-bold text-gray-800' }, 'Where'),
+                                                e('p', { className: 'text-xl text-green-600 font-semibold' },
+                                                    '3356 New Castle Drive'
+                                                )
+                                            )
+                                        ),
 
-                        stickerBook.length === 0 ? (
-                            e('div', { className: 'bg-white rounded-2xl p-8 shadow-lg text-center' },
-                                e('div', { className: 'text-4xl mb-4' }, '📖'),
-                                e('p', { className: 'text-gray-600 mb-4' }, 'Your sticker book is empty!'),
-                                e('p', { className: 'text-sm text-gray-500' }, 'Play quizzes to earn points and buy stickers!')
-                            )
-                        ) : (
-                            e('div', { className: 'bg-white rounded-2xl p-4 mb-4 shadow-lg' },
-                                e('div', { className: 'grid grid-cols-3 gap-4' },
-                                    ...stickerBook.map((sticker, index) =>
-                                        e('div', { key: index, className: 'text-center p-3 bg-yellow-100 rounded-xl' },
-                                            e('div', { className: 'text-3xl mb-1' }, sticker.emoji),
-                                            e('p', { className: 'text-xs font-semibold text-purple-600' }, sticker.name)
+                                        // Theme
+                                        e('div', { className: 'flex items-center gap-4' },
+                                            e('div', { className: 'text-4xl bounce-animation' }, '🎄'),
+                                            e('div', null,
+                                                e('p', { className: 'text-lg font-bold text-gray-800' }, 'Theme'),
+                                                e('p', { className: 'text-xl text-purple-600 font-semibold' },
+                                                    'Wear Your Ugliest Sweater!'
+                                                )
+                                            )
+                                        ),
+
+                                        // Food
+                                        e('div', { className: 'flex items-center gap-4' },
+                                            e('div', { className: 'text-4xl' }, '🍪'),
+                                            e('div', null,
+                                                e('p', { className: 'text-lg font-bold text-gray-800' }, 'Bring'),
+                                                e('p', { className: 'text-xl text-orange-600 font-semibold' },
+                                                    'A Finger Food to Share'
+                                                )
+                                            )
                                         )
                                     )
+                                ),
+
+                                // Fun decorative elements
+                                e('div', { className: 'text-center mb-6' },
+                                    e('div', { className: 'flex justify-center gap-4 text-4xl mb-4' },
+                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0s' } }, '🎁'),
+                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0.2s' } }, '⛄'),
+                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0.4s' } }, '🎅'),
+                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0.6s' } }, '🦌'),
+                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0.8s' } }, '❄️')
+                                    ),
+                                    e('p', { className: 'text-2xl font-bold text-red-600 mb-2' },
+                                        'Get Ready to Jingle & Mingle!'
+                                    ),
+                                    e('p', { className: 'text-gray-600 italic' },
+                                        'The uglier the sweater, the better!'
+                                    )
+                                ),
+
+                                // RSVP Section
+                                !rsvpStatus ? (
+                                    e('div', { className: 'bg-blue-50 rounded-2xl p-6' },
+                                        e('h3', { className: 'text-xl font-bold text-center text-blue-900 mb-4' },
+                                            'Will you be joining us?'
+                                        ),
+                                        e('div', { className: 'mb-4' },
+                                            e('input', {
+                                                type: 'text',
+                                                placeholder: 'Your Name',
+                                                value: guestName,
+                                                onChange: (e) => setGuestName(e.target.value),
+                                                className: 'w-full p-3 rounded-xl border-2 border-blue-300 focus:border-blue-500 focus:outline-none text-lg'
+                                            })
+                                        ),
+                                        e('div', { className: 'flex gap-3' },
+                                            e('button', {
+                                                onClick: () => guestName.trim() && setRsvpStatus('yes'),
+                                                disabled: !guestName.trim(),
+                                                className: 'flex-1 bg-green-500 text-white py-3 px-6 rounded-xl text-lg font-bold hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all transform hover:scale-105'
+                                            }, '✓ Yes!'),
+                                            e('button', {
+                                                onClick: () => guestName.trim() && setRsvpStatus('maybe'),
+                                                disabled: !guestName.trim(),
+                                                className: 'flex-1 bg-yellow-500 text-white py-3 px-6 rounded-xl text-lg font-bold hover:bg-yellow-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all transform hover:scale-105'
+                                            }, '? Maybe'),
+                                            e('button', {
+                                                onClick: () => guestName.trim() && setRsvpStatus('no'),
+                                                disabled: !guestName.trim(),
+                                                className: 'flex-1 bg-red-500 text-white py-3 px-6 rounded-xl text-lg font-bold hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all transform hover:scale-105'
+                                            }, '✗ No')
+                                        )
+                                    )
+                                ) : (
+                                    e('div', { className: 'bg-green-50 rounded-2xl p-6 text-center' },
+                                        e('div', { className: 'text-5xl mb-3' },
+                                            rsvpStatus === 'yes' ? '🎉' : rsvpStatus === 'maybe' ? '🤔' : '😢'
+                                        ),
+                                        e('p', { className: 'text-2xl font-bold mb-2' },
+                                            rsvpStatus === 'yes'
+                                                ? `Awesome, ${guestName}! Can't wait to see you!`
+                                                : rsvpStatus === 'maybe'
+                                                    ? `Thanks ${guestName}! Hope you can make it!`
+                                                    : `Sorry you can't make it, ${guestName}!`
+                                        ),
+                                        e('button', {
+                                            onClick: () => { setRsvpStatus(null); setGuestName(''); },
+                                            className: 'mt-3 text-blue-600 font-semibold hover:underline'
+                                        }, 'Change RSVP')
+                                    )
                                 )
                             )
                         ),
 
-                        e('button', {
-                            onClick: () => setCurrentScreen('menu'),
-                            className: 'w-full bg-purple-500 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-purple-600 transition-colors'
-                        }, 'Back to Menu')
-                    )
-                );
-            }
+                        // Action Buttons (outside the card for download)
+                        e('div', { className: 'no-print flex flex-col sm:flex-row gap-4' },
+                            e('button', {
+                                onClick: handleDownload,
+                                disabled: downloading,
+                                className: 'flex-1 bg-red-600 text-white py-4 px-6 rounded-2xl text-xl font-bold hover:bg-red-700 disabled:bg-gray-400 transition-all transform hover:scale-105 pulse-glow flex items-center justify-center gap-2'
+                            },
+                                downloading ? 'Preparing...' : '📥 Download Invitation'
+                            ),
+                            e('button', {
+                                onClick: handleShare,
+                                className: 'flex-1 bg-green-600 text-white py-4 px-6 rounded-2xl text-xl font-bold hover:bg-green-700 transition-all transform hover:scale-105 pulse-glow flex items-center justify-center gap-2'
+                            },
+                                '📱 Share via Text'
+                            )
+                        ),
 
-            return null;
+                        // Instructions
+                        e('div', { className: 'no-print text-center mt-4 text-white text-sm' },
+                            e('p', { className: 'mb-2' }, '💡 Tip: Download the image or click share to send via text message!'),
+                            e('p', null, 'On mobile, you can also take a screenshot to share directly.')
+                        )
+                    )
+                )
+            );
         };
 
         // Render the app
-        ReactDOM.render(e(AnimalQuizApp), document.getElementById('root'));
+        ReactDOM.render(e(UglySweaterParty), document.getElementById('root'));
     </script>
 </body>
 </html>
