@@ -3,30 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ugly Sweater Holiday Party!</title>
-
-    <!-- React Production -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- html2canvas for screenshot -->
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-
-    <!-- Mobile Meta -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#DC2626">
-
+    <title>Zoo Quest - Animal Quiz Adventure!</title>
     <style>
-        body { margin: 0; padding: 0; font-family: system-ui, sans-serif; overflow-x: hidden; }
-        * { box-sizing: border-box; }
-        #root { min-height: 100vh; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(360deg); opacity: 0.8; }
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Color-blind friendly palette */
+        :root {
+            --primary-blue: #0077BE;
+            --primary-orange: #FF8C42;
+            --success-green: #00A86B;
+            --warning-red: #E63946;
+            --neutral-gray: #6C757D;
+            --light-bg: #F8F9FA;
+            --dark-text: #212529;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+            border-radius: 15px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--light-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 3px solid;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.level { border-color: var(--primary-blue); }
+        .stat-card.score { border-color: var(--primary-orange); }
+        .stat-card.coins { border-color: var(--success-green); }
+        .stat-card.streak { border-color: var(--warning-red); }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--neutral-gray);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+
+        .character-badge {
+            background: linear-gradient(135deg, var(--primary-orange), var(--warning-red));
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .quiz-section {
+            background: var(--light-bg);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 4px solid var(--primary-blue);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .difficulty-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            border: 3px solid;
+        }
+
+        .difficulty-easy {
+            background: #D4EDDA;
+            border-color: var(--success-green);
+            color: var(--success-green);
+        }
+
+        .difficulty-medium {
+            background: #FFF3CD;
+            border-color: var(--primary-orange);
+            color: #856404;
+        }
+
+        .difficulty-hard {
+            background: #F8D7DA;
+            border-color: var(--warning-red);
+            color: var(--warning-red);
+        }
+
+        .question-text {
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            color: var(--dark-text);
+            line-height: 1.4;
+            font-weight: bold;
+        }
+
+        .answers-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .answer-btn {
+            padding: 20px;
+            font-size: 1.2em;
+            border: 4px solid var(--primary-blue);
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-btn:hover {
+            transform: translateX(10px);
+            background: var(--light-bg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .answer-btn.correct {
+            background: var(--success-green);
+            color: white;
+            border-color: var(--success-green);
+        }
+
+        .answer-btn.incorrect {
+            background: var(--warning-red);
+            color: white;
+            border-color: var(--warning-red);
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .feedback-section {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.2em;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback-section.correct {
+            background: var(--success-green);
+            color: white;
+            display: block;
+            border: 4px solid #006B4E;
+        }
+
+        .feedback-section.incorrect {
+            background: var(--warning-red);
+            color: white;
+            display: block;
+            border: 4px solid #B02A37;
+        }
+
+        .next-btn {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .next-btn:hover {
+            background: #005A8C;
+            transform: scale(1.05);
+        }
+
+        .next-btn.show {
+            display: block;
+        }
+
+        .zoo-section {
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 4px solid var(--success-green);
+        }
+
+        .zoo-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .zoo-header h2 {
+            font-size: 2em;
+            color: var(--success-green);
+            margin-bottom: 10px;
+        }
+
+        .zoo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .zoo-animal {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 3px solid var(--success-green);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .zoo-animal .emoji {
+            font-size: 3em;
+            margin-bottom: 5px;
+        }
+
+        .zoo-animal .name {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+
+        .zoo-animal.locked {
+            opacity: 0.4;
+            border-style: dashed;
+            border-color: var(--neutral-gray);
+        }
+
+        .zoo-animal.locked .emoji {
+            filter: grayscale(100%);
+        }
+
+        .shop-section {
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+            padding: 30px;
+            border-radius: 15px;
+            border: 4px solid var(--primary-orange);
+        }
+
+        .shop-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .shop-header h2 {
+            font-size: 2em;
+            color: var(--primary-orange);
+            margin-bottom: 10px;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .shop-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 3px solid var(--primary-orange);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .shop-item .emoji {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+
+        .shop-item .name {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--dark-text);
+        }
+
+        .shop-item .price {
+            font-size: 1.3em;
+            color: var(--success-green);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .buy-btn {
+            padding: 10px 20px;
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .buy-btn:hover:not(:disabled) {
+            background: #E67732;
+            transform: scale(1.05);
+        }
+
+        .buy-btn:disabled {
+            background: var(--neutral-gray);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .progress-bar {
+            background: #E0E0E0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 3px solid var(--primary-blue);
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-orange));
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            border: 5px solid var(--success-green);
+            display: none;
+        }
+
+        .celebration.show {
+            display: block;
+            animation: celebrationPop 0.5s ease;
+        }
+
+        @keyframes celebrationPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .celebration h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: var(--success-green);
+        }
+
+        .celebration p {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .celebration .emoji {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
         }
 
         @keyframes bounce {
@@ -34,321 +443,607 @@
             50% { transform: translateY(-20px); }
         }
 
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(-3deg); }
-            50% { transform: rotate(3deg); }
-        }
-
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(220, 38, 38, 0.8); }
-        }
-
-        .snowflake {
-            position: fixed;
-            top: -10vh;
+        .close-btn {
+            padding: 15px 40px;
+            background: var(--primary-blue);
             color: white;
-            font-size: 1.5em;
-            opacity: 0.8;
-            animation: fall linear infinite;
-            pointer-events: none;
-            z-index: 1000;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2em;
         }
 
-        .bounce-animation {
-            animation: bounce 2s ease-in-out infinite;
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        .wiggle-animation {
-            animation: wiggle 1s ease-in-out infinite;
+        .tab-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background: white;
+            border: 3px solid var(--primary-blue);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            color: var(--dark-text);
         }
 
-        .pulse-glow {
-            animation: pulse-glow 2s ease-in-out infinite;
+        .tab-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .sweater-pattern {
-            background: linear-gradient(45deg, #DC2626 25%, #16A34A 25%, #16A34A 50%, #DC2626 50%, #DC2626 75%, #16A34A 75%, #16A34A);
-            background-size: 40px 40px;
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
         }
 
-        @media print {
-            .no-print { display: none; }
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .question-text {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 15px;
+            }
+
+            .stats-bar {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="container">
+        <div class="header">
+            <h1>🦁 Zoo Quest 🐘</h1>
+            <p>Become the Ultimate Zookeeper & Veterinarian!</p>
+        </div>
+
+        <div class="character-badge" id="characterBadge">
+            🎓 Junior Zookeeper - Level 1
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card level">
+                <div class="stat-label">🎯 Level</div>
+                <div class="stat-value" id="levelDisplay">1</div>
+            </div>
+            <div class="stat-card score">
+                <div class="stat-label">⭐ Score</div>
+                <div class="stat-value" id="scoreDisplay">0</div>
+            </div>
+            <div class="stat-card coins">
+                <div class="stat-label">🪙 Coins</div>
+                <div class="stat-value" id="coinsDisplay">0</div>
+            </div>
+            <div class="stat-card streak">
+                <div class="stat-label">🔥 Streak</div>
+                <div class="stat-value" id="streakDisplay">0</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill">0/10 to next level</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('quiz')">📝 Quiz</button>
+            <button class="tab-btn" onclick="switchTab('zoo')">🏞️ My Zoo</button>
+            <button class="tab-btn" onclick="switchTab('shop')">🛒 Shop</button>
+        </div>
+
+        <div id="quizTab" class="tab-content active">
+            <div class="quiz-section">
+                <div class="question-header">
+                    <span id="questionNumber">Question 1</span>
+                    <span class="difficulty-badge difficulty-easy" id="difficultyBadge">Easy</span>
+                </div>
+                <div class="question-text" id="questionText">Loading question...</div>
+                <div class="answers-grid" id="answersGrid"></div>
+                <div class="feedback-section" id="feedbackSection"></div>
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+            </div>
+        </div>
+
+        <div id="zooTab" class="tab-content">
+            <div class="zoo-section">
+                <div class="zoo-header">
+                    <h2>🦁 Your Amazing Zoo! 🐘</h2>
+                    <p>Collect animals by answering questions correctly!</p>
+                </div>
+                <div class="zoo-grid" id="zooGrid"></div>
+            </div>
+        </div>
+
+        <div id="shopTab" class="tab-content">
+            <div class="shop-section">
+                <div class="shop-header">
+                    <h2>🛒 Animal Shop</h2>
+                    <p>Buy new animals with your coins!</p>
+                </div>
+                <div class="shop-grid" id="shopGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="celebration" id="celebrationModal">
+        <div class="emoji">🎉</div>
+        <h2 id="celebrationTitle">Level Up!</h2>
+        <p id="celebrationText">You've reached a new level!</p>
+        <button class="close-btn" onclick="closeCelebration()">Continue!</button>
+    </div>
 
     <script>
-        const { useState, useEffect } = React;
-        const e = React.createElement;
-
-        const Snowflake = ({ delay, duration, left }) => {
-            return e('div', {
-                className: 'snowflake',
-                style: {
-                    left: `${left}%`,
-                    animationDelay: `${delay}s`,
-                    animationDuration: `${duration}s`
-                }
-            }, '❄️');
+        // Game State
+        let gameState = {
+            level: 1,
+            score: 0,
+            coins: 0,
+            streak: 0,
+            questionsAnswered: 0,
+            questionsCorrect: 0,
+            currentQuestionIndex: 0,
+            unlockedAnimals: [],
+            currentTab: 'quiz'
         };
 
-        const UglySweaterParty = () => {
-            const [rsvpStatus, setRsvpStatus] = useState(null);
-            const [guestName, setGuestName] = useState('');
-            const [downloading, setDownloading] = useState(false);
+        // Character progression titles
+        const characterTitles = [
+            { level: 1, title: "🎓 Junior Zookeeper" },
+            { level: 5, title: "🌟 Zookeeper" },
+            { level: 10, title: "🏆 Senior Zookeeper" },
+            { level: 15, title: "🩺 Veterinary Assistant" },
+            { level: 20, title: "💉 Junior Veterinarian" },
+            { level: 30, title: "🏥 Veterinarian" },
+            { level: 40, title: "👨‍⚕️ Senior Veterinarian" },
+            { level: 50, title: "🌍 Wildlife Expert" },
+            { level: 75, title: "🔬 Conservation Scientist" },
+            { level: 100, title: "🎖️ Zoo Director" }
+        ];
 
-            // Generate snowflakes
-            const snowflakes = Array.from({ length: 30 }, (_, i) => ({
-                id: i,
-                delay: Math.random() * 5,
-                duration: 8 + Math.random() * 7,
-                left: Math.random() * 100
-            }));
+        // Comprehensive question database with 120+ questions
+        const questions = [
+            // Easy Questions (Levels 1-5)
+            { q: "What sound does a lion make?", a: ["Roar", "Meow", "Bark", "Moo"], correct: 0, difficulty: "easy", category: "sounds" },
+            { q: "What color is a zebra?", a: ["Black and white", "Brown and yellow", "Green and blue", "Red and orange"], correct: 0, difficulty: "easy", category: "appearance" },
+            { q: "Which animal has a trunk?", a: ["Elephant", "Giraffe", "Monkey", "Bear"], correct: 0, difficulty: "easy", category: "anatomy" },
+            { q: "What do pandas eat?", a: ["Bamboo", "Meat", "Fish", "Insects"], correct: 0, difficulty: "easy", category: "diet" },
+            { q: "Which animal is known as the 'King of the Jungle'?", a: ["Lion", "Tiger", "Bear", "Gorilla"], correct: 0, difficulty: "easy", category: "facts" },
+            { q: "What bird cannot fly?", a: ["Penguin", "Eagle", "Parrot", "Sparrow"], correct: 0, difficulty: "easy", category: "abilities" },
+            { q: "Which animal has a very long neck?", a: ["Giraffe", "Horse", "Camel", "Deer"], correct: 0, difficulty: "easy", category: "anatomy" },
+            { q: "What do bees make?", a: ["Honey", "Milk", "Silk", "Wax only"], correct: 0, difficulty: "easy", category: "products" },
+            { q: "Which animal lives in water and on land?", a: ["Frog", "Fish", "Bird", "Snake"], correct: 0, difficulty: "easy", category: "habitat" },
+            { q: "What color is a flamingo?", a: ["Pink", "Blue", "Green", "Yellow"], correct: 0, difficulty: "easy", category: "appearance" },
+            { q: "Which animal has black and white stripes?", a: ["Zebra", "Horse", "Donkey", "Cow"], correct: 0, difficulty: "easy", category: "appearance" },
+            { q: "What do koalas eat?", a: ["Eucalyptus leaves", "Bamboo", "Fish", "Insects"], correct: 0, difficulty: "easy", category: "diet" },
+            { q: "Which animal is the fastest land animal?", a: ["Cheetah", "Lion", "Horse", "Dog"], correct: 0, difficulty: "easy", category: "abilities" },
+            { q: "What is a baby kangaroo called?", a: ["Joey", "Cub", "Puppy", "Kitten"], correct: 0, difficulty: "easy", category: "names" },
+            { q: "Which animal has a pouch?", a: ["Kangaroo", "Bear", "Deer", "Fox"], correct: 0, difficulty: "easy", category: "anatomy" },
+            { q: "What do cows give us?", a: ["Milk", "Eggs", "Honey", "Wool"], correct: 0, difficulty: "easy", category: "products" },
+            { q: "Which animal says 'oink'?", a: ["Pig", "Cow", "Sheep", "Horse"], correct: 0, difficulty: "easy", category: "sounds" },
+            { q: "What is the largest land animal?", a: ["Elephant", "Giraffe", "Hippo", "Rhino"], correct: 0, difficulty: "easy", category: "size" },
+            { q: "Which animal sleeps hanging upside down?", a: ["Bat", "Monkey", "Sloth", "Koala"], correct: 0, difficulty: "easy", category: "behavior" },
+            { q: "What do sheep give us?", a: ["Wool", "Milk only", "Eggs", "Honey"], correct: 0, difficulty: "easy", category: "products" },
 
-            const handleDownload = async () => {
-                setDownloading(true);
-                try {
-                    const element = document.getElementById('invitation-card');
-                    const canvas = await html2canvas(element, {
-                        scale: 2,
-                        backgroundColor: '#1e40af',
-                        logging: false
-                    });
+            // Medium Questions (Levels 6-15)
+            { q: "How many humps does a Bactrian camel have?", a: ["Two", "One", "Three", "None"], correct: 0, difficulty: "medium", category: "anatomy" },
+            { q: "Which is the largest species of bear?", a: ["Polar bear", "Grizzly bear", "Black bear", "Panda bear"], correct: 0, difficulty: "medium", category: "size" },
+            { q: "What is a group of lions called?", a: ["Pride", "Pack", "Herd", "Flock"], correct: 0, difficulty: "medium", category: "groups" },
+            { q: "How many legs does a spider have?", a: ["8", "6", "10", "12"], correct: 0, difficulty: "medium", category: "anatomy" },
+            { q: "Which animal can change its color?", a: ["Chameleon", "Lizard", "Snake", "Turtle"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "What is the fastest marine animal?", a: ["Sailfish", "Dolphin", "Shark", "Whale"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "How long is a giraffe's tongue?", a: ["About 20 inches", "About 5 inches", "About 12 inches", "About 30 inches"], correct: 0, difficulty: "medium", category: "anatomy" },
+            { q: "Which bird can fly backwards?", a: ["Hummingbird", "Eagle", "Owl", "Parrot"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "What is the only mammal that can truly fly?", a: ["Bat", "Flying squirrel", "Sugar glider", "Flying lemur"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "How many hearts does an octopus have?", a: ["3", "1", "2", "4"], correct: 0, difficulty: "medium", category: "anatomy" },
+            { q: "Which animal has the longest lifespan?", a: ["Bowhead whale", "Elephant", "Turtle", "Parrot"], correct: 0, difficulty: "medium", category: "facts" },
+            { q: "What is a baby swan called?", a: ["Cygnet", "Duckling", "Gosling", "Chick"], correct: 0, difficulty: "medium", category: "names" },
+            { q: "Which animal never sleeps?", a: ["Bullfrog", "Shark", "Dolphin", "Fish"], correct: 0, difficulty: "medium", category: "behavior" },
+            { q: "How many teeth does an adult human have compared to a shark?", a: ["Humans: 32, Sharks: up to 300", "Same amount", "Humans have more", "Sharks have exactly 50"], correct: 0, difficulty: "medium", category: "anatomy" },
+            { q: "What is the smallest mammal in the world?", a: ["Bumblebee bat", "Mouse", "Shrew", "Hamster"], correct: 0, difficulty: "medium", category: "size" },
+            { q: "Which animal has the strongest bite force?", a: ["Nile crocodile", "Great white shark", "Lion", "Hippo"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "How do emperor penguins keep their eggs warm?", a: ["On their feet", "In a nest", "Underground", "In water"], correct: 0, difficulty: "medium", category: "behavior" },
+            { q: "What is a group of dolphins called?", a: ["Pod", "School", "Herd", "Pack"], correct: 0, difficulty: "medium", category: "groups" },
+            { q: "Which animal can hold its breath the longest underwater?", a: ["Cuvier's beaked whale", "Dolphin", "Seal", "Otter"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "How many stomachs does a cow have?", a: ["4", "2", "1", "3"], correct: 0, difficulty: "medium", category: "anatomy" },
+            { q: "What is the largest species of penguin?", a: ["Emperor penguin", "King penguin", "Gentoo penguin", "Adelie penguin"], correct: 0, difficulty: "medium", category: "size" },
+            { q: "Which animal has rectangular pupils?", a: ["Goat", "Cat", "Dog", "Horse"], correct: 0, difficulty: "medium", category: "anatomy" },
+            { q: "How fast can a cheetah run?", a: ["70 mph", "50 mph", "90 mph", "30 mph"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "What is the only continent where giraffes live in the wild?", a: ["Africa", "Asia", "South America", "Australia"], correct: 0, difficulty: "medium", category: "habitat" },
+            { q: "How many species of bears are there?", a: ["8", "5", "10", "12"], correct: 0, difficulty: "medium", category: "facts" },
+            { q: "What is a baby fox called?", a: ["Kit", "Pup", "Cub", "Joey"], correct: 0, difficulty: "medium", category: "names" },
+            { q: "Which animal can jump the highest?", a: ["Flea (relative to size)", "Kangaroo", "Frog", "Rabbit"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "How long can a camel go without water?", a: ["Up to 2 weeks", "3 days", "1 month", "1 week"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "What is the loudest animal on Earth?", a: ["Blue whale", "Elephant", "Howler monkey", "Lion"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "Which mammal lays eggs?", a: ["Platypus", "Bat", "Whale", "Seal"], correct: 0, difficulty: "medium", category: "reproduction" },
 
-                    const link = document.createElement('a');
-                    link.download = 'ugly-sweater-party-invite.png';
-                    link.href = canvas.toDataURL();
-                    link.click();
-                } catch (error) {
-                    alert('Download failed. Please try taking a screenshot instead!');
-                }
-                setDownloading(false);
-            };
+            // Hard Questions (Levels 16+)
+            { q: "What percentage of a polar bear's diet is meat?", a: ["90%", "50%", "70%", "100%"], correct: 0, difficulty: "hard", category: "diet" },
+            { q: "How many species of animals are estimated to exist on Earth?", a: ["8.7 million", "1 million", "20 million", "500,000"], correct: 0, difficulty: "hard", category: "facts" },
+            { q: "What is the gestation period of an African elephant?", a: ["22 months", "12 months", "18 months", "9 months"], correct: 0, difficulty: "hard", category: "reproduction" },
+            { q: "Which animal has the largest brain relative to body size?", a: ["Ant", "Human", "Dolphin", "Elephant"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "How many bones are in a giraffe's neck?", a: ["7 (same as humans)", "15", "20", "12"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "What is the only bird that can smell?", a: ["Kiwi", "Vulture", "Eagle", "Owl"], correct: 0, difficulty: "hard", category: "abilities" },
+            { q: "How many queen bees are in a hive?", a: ["Usually 1", "5-10", "Hundreds", "None"], correct: 0, difficulty: "hard", category: "social" },
+            { q: "What is the lifespan of a mayfly?", a: ["24 hours", "1 week", "1 month", "1 year"], correct: 0, difficulty: "hard", category: "facts" },
+            { q: "Which animal has the highest blood pressure?", a: ["Giraffe", "Elephant", "Blue whale", "Human"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "How many chambers does a crocodile's heart have?", a: ["4", "2", "3", "5"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "What is the smallest bird in the world?", a: ["Bee hummingbird", "Sparrow", "Wren", "Finch"], correct: 0, difficulty: "hard", category: "size" },
+            { q: "How far can a wolf smell its prey?", a: ["Nearly 2 miles", "500 feet", "1 mile", "100 feet"], correct: 0, difficulty: "hard", category: "abilities" },
+            { q: "What is unique about a flamingo's diet that makes them pink?", a: ["Carotenoid pigments from algae and crustaceans", "They are born pink", "Pink berries", "Genetic mutation"], correct: 0, difficulty: "hard", category: "diet" },
+            { q: "How many eyelids does a camel have?", a: ["3 per eye", "2 per eye", "1 per eye", "4 per eye"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "Which animal has the longest migration?", a: ["Arctic tern", "Monarch butterfly", "Gray whale", "Caribou"], correct: 0, difficulty: "hard", category: "behavior" },
+            { q: "What is the only marsupial native to North America?", a: ["Opossum", "Kangaroo rat", "Prairie dog", "Raccoon"], correct: 0, difficulty: "hard", category: "habitat" },
+            { q: "How many neurons are in an octopus's brain?", a: ["500 million", "100 million", "1 billion", "50 million"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "What temperature is a penguin's body?", a: ["100°F (38°C)", "85°F (29°C)", "75°F (24°C)", "95°F (35°C)"], correct: 0, difficulty: "hard", category: "physiology" },
+            { q: "How long can a sea otter hold its breath?", a: ["5 minutes", "15 minutes", "2 minutes", "30 minutes"], correct: 0, difficulty: "hard", category: "abilities" },
+            { q: "What percentage of a sloth's life is spent sleeping?", a: ["15-20 hours per day", "8 hours per day", "5 hours per day", "23 hours per day"], correct: 0, difficulty: "hard", category: "behavior" },
+            { q: "How many taste buds does a catfish have?", a: ["Over 100,000", "5,000", "20,000", "50,000"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "What is the cruising speed of a migrating hummingbird?", a: ["25-30 mph", "10 mph", "50 mph", "5 mph"], correct: 0, difficulty: "hard", category: "abilities" },
+            { q: "How many teeth can a great white shark go through in its lifetime?", a: ["30,000", "5,000", "10,000", "50,000"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "What is the body temperature of a hummingbird at night?", a: ["Can drop to near ambient temperature (torpor)", "Stays the same", "Increases", "They don't sleep"], correct: 0, difficulty: "hard", category: "physiology" },
+            { q: "How many chromosomes does a butterfly have?", a: ["380 (some species)", "46", "100", "200"], correct: 0, difficulty: "hard", category: "genetics" },
+            { q: "What is the diving depth record for a sperm whale?", a: ["Over 7,000 feet", "2,000 feet", "15,000 feet", "1,000 feet"], correct: 0, difficulty: "hard", category: "abilities" },
+            { q: "How many different calls can a crow make?", a: ["Over 250", "20", "100", "500"], correct: 0, difficulty: "hard", category: "communication" },
+            { q: "What is the running speed of an ostrich?", a: ["45 mph", "30 mph", "60 mph", "20 mph"], correct: 0, difficulty: "hard", category: "abilities" },
+            { q: "How long is the tongue of a giant anteater?", a: ["2 feet", "6 inches", "1 foot", "3 feet"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "What is unique about a sea cucumber's defense mechanism?", a: ["Expels internal organs", "Changes color", "Releases poison", "Plays dead"], correct: 0, difficulty: "hard", category: "defense" },
 
-            const handleShare = async () => {
-                const text = `You're Invited to our Ugly Sweater Holiday Party!\n\nDate: December 6th at 3pm\nLocation: 3356 New Castle Drive\nTheme: Ugly Sweater Party\n\nPlease bring a finger food to share!\n\nSee you there!`;
+            // Additional variety questions
+            { q: "What is a group of flamingos called?", a: ["Flamboyance", "Flock", "Pride", "Colony"], correct: 0, difficulty: "medium", category: "groups" },
+            { q: "Which animal's fingerprints are nearly identical to humans?", a: ["Koala", "Monkey", "Chimpanzee", "Gorilla"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "How many legs does a lobster have?", a: ["10", "8", "6", "12"], correct: 0, difficulty: "easy", category: "anatomy" },
+            { q: "What is the national animal of Scotland?", a: ["Unicorn", "Lion", "Dragon", "Eagle"], correct: 0, difficulty: "hard", category: "culture" },
+            { q: "Which animal can survive in space?", a: ["Tardigrade", "Cockroach", "Rat", "Fish"], correct: 0, difficulty: "hard", category: "abilities" },
+            { q: "What do you call a baby platypus?", a: ["Puggle", "Pup", "Kit", "Cub"], correct: 0, difficulty: "medium", category: "names" },
+            { q: "How many eyes does a honeybee have?", a: ["5", "2", "6", "8"], correct: 0, difficulty: "medium", category: "anatomy" },
+            { q: "Which animal is known to laugh?", a: ["Hyena", "Monkey", "Dolphin", "Parrot"], correct: 0, difficulty: "easy", category: "behavior" },
+            { q: "What is the strongest muscle in the human body compared to an elephant's trunk?", a: ["Elephant trunk has 40,000 muscles", "Both have same", "Human tongue is stronger", "Human jaw is stronger"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "How do starfish eat?", a: ["They push their stomach out", "Through their mouth", "They absorb nutrients", "Through their skin"], correct: 0, difficulty: "hard", category: "digestion" },
+            { q: "What color is a giraffe's tongue?", a: ["Blue-black", "Pink", "Red", "Purple"], correct: 0, difficulty: "medium", category: "anatomy" },
+            { q: "Which animal can regenerate its heart?", a: ["Axolotl", "Starfish", "Lizard", "Crab"], correct: 0, difficulty: "hard", category: "abilities" },
+            { q: "How many noses does a slug have?", a: ["4", "1", "2", "6"], correct: 0, difficulty: "hard", category: "anatomy" },
+            { q: "What animal is known for building dams?", a: ["Beaver", "Otter", "Muskrat", "Platypus"], correct: 0, difficulty: "easy", category: "behavior" },
+            { q: "Which fish can walk on land?", a: ["Mudskipper", "Salmon", "Catfish", "Eel"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "How many years can a sea sponge live?", a: ["Thousands of years", "100 years", "50 years", "10 years"], correct: 0, difficulty: "hard", category: "lifespan" },
+            { q: "What is the fastest insect?", a: ["Dragonfly", "Bee", "Butterfly", "Mosquito"], correct: 0, difficulty: "medium", category: "abilities" },
+            { q: "Which animal has blue blood?", a: ["Horseshoe crab", "Octopus", "Squid", "All of these"], correct: 3, difficulty: "hard", category: "anatomy" },
+            { q: "How do snakes smell?", a: ["With their tongue", "With their nose", "With their skin", "They can't smell"], correct: 0, difficulty: "medium", category: "senses" },
+            { q: "What is a group of crows called?", a: ["Murder", "Flock", "Gaggle", "Pride"], correct: 0, difficulty: "medium", category: "groups" }
+        ];
 
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'Ugly Sweater Holiday Party',
-                            text: text
-                        });
-                    } catch (error) {
-                        copyToClipboard(text);
+        // Available animals for the zoo
+        const zooAnimals = [
+            { emoji: "🦁", name: "Lion", cost: 0, unlocked: false },
+            { emoji: "🐘", name: "Elephant", cost: 50, unlocked: false },
+            { emoji: "🦒", name: "Giraffe", cost: 100, unlocked: false },
+            { emoji: "🐼", name: "Panda", cost: 150, unlocked: false },
+            { emoji: "🦓", name: "Zebra", cost: 200, unlocked: false },
+            { emoji: "🦏", name: "Rhino", cost: 250, unlocked: false },
+            { emoji: "🦛", name: "Hippo", cost: 300, unlocked: false },
+            { emoji: "🐅", name: "Tiger", cost: 350, unlocked: false },
+            { emoji: "🐆", name: "Leopard", cost: 400, unlocked: false },
+            { emoji: "🦍", name: "Gorilla", cost: 450, unlocked: false },
+            { emoji: "🐻", name: "Bear", cost: 500, unlocked: false },
+            { emoji: "🦘", name: "Kangaroo", cost: 550, unlocked: false },
+            { emoji: "🐨", name: "Koala", cost: 600, unlocked: false },
+            { emoji: "🦥", name: "Sloth", cost: 650, unlocked: false },
+            { emoji: "🦦", name: "Otter", cost: 700, unlocked: false },
+            { emoji: "🦫", name: "Beaver", cost: 750, unlocked: false },
+            { emoji: "🐪", name: "Camel", cost: 800, unlocked: false },
+            { emoji: "🦙", name: "Llama", cost: 850, unlocked: false },
+            { emoji: "🐊", name: "Crocodile", cost: 900, unlocked: false },
+            { emoji: "🦎", name: "Lizard", cost: 950, unlocked: false },
+            { emoji: "🐍", name: "Snake", cost: 1000, unlocked: false },
+            { emoji: "🐢", name: "Turtle", cost: 1100, unlocked: false },
+            { emoji: "🦈", name: "Shark", cost: 1200, unlocked: false },
+            { emoji: "🐬", name: "Dolphin", cost: 1300, unlocked: false },
+            { emoji: "🐳", name: "Whale", cost: 1400, unlocked: false },
+            { emoji: "🐧", name: "Penguin", cost: 1500, unlocked: false },
+            { emoji: "🦩", name: "Flamingo", cost: 1600, unlocked: false },
+            { emoji: "🦜", name: "Parrot", cost: 1700, unlocked: false },
+            { emoji: "🦅", name: "Eagle", cost: 1800, unlocked: false },
+            { emoji: "🦉", name: "Owl", cost: 1900, unlocked: false },
+            { emoji: "🐝", name: "Bee", cost: 2000, unlocked: false },
+            { emoji: "🦋", name: "Butterfly", cost: 2100, unlocked: false },
+            { emoji: "🐛", name: "Caterpillar", cost: 2200, unlocked: false },
+            { emoji: "🦗", name: "Cricket", cost: 2300, unlocked: false },
+            { emoji: "🕷️", name: "Spider", cost: 2400, unlocked: false },
+            { emoji: "🦂", name: "Scorpion", cost: 2500, unlocked: false }
+        ];
+
+        // Load saved game state
+        function loadGame() {
+            const saved = localStorage.getItem('zooQuestGame');
+            if (saved) {
+                const savedState = JSON.parse(saved);
+                gameState = { ...gameState, ...savedState };
+
+                // Restore zoo animals unlocked state
+                savedState.unlockedAnimals.forEach(index => {
+                    if (zooAnimals[index]) {
+                        zooAnimals[index].unlocked = true;
                     }
-                } else {
-                    copyToClipboard(text);
-                }
-            };
-
-            const copyToClipboard = (text) => {
-                navigator.clipboard.writeText(text).then(() => {
-                    alert('Party details copied to clipboard! Paste into your text message.');
-                }).catch(() => {
-                    alert('Please manually copy the party details from the card.');
                 });
-            };
+            } else {
+                // First time playing - unlock the first animal (Lion)
+                zooAnimals[0].unlocked = true;
+                gameState.unlockedAnimals.push(0);
+            }
+            updateDisplay();
+        }
 
-            return e('div', {
-                className: 'min-h-screen bg-gradient-to-b from-blue-800 via-blue-900 to-blue-950 relative overflow-hidden'
-            },
-                // Snowflakes
-                ...snowflakes.map(flake =>
-                    e(Snowflake, {
-                        key: flake.id,
-                        delay: flake.delay,
-                        duration: flake.duration,
-                        left: flake.left
-                    })
-                ),
+        // Save game state
+        function saveGame() {
+            localStorage.setItem('zooQuestGame', JSON.stringify(gameState));
+        }
 
-                // Main Content
-                e('div', { className: 'relative z-10 min-h-screen flex items-center justify-center p-4' },
-                    e('div', { className: 'max-w-2xl w-full' },
-                        // Invitation Card
-                        e('div', {
-                            id: 'invitation-card',
-                            className: 'bg-white rounded-3xl shadow-2xl overflow-hidden mb-6'
-                        },
-                            // Header with ugly sweater pattern
-                            e('div', { className: 'sweater-pattern p-8 text-center relative' },
-                                e('div', { className: 'bounce-animation inline-block text-6xl mb-4' }, '🎄'),
-                                e('h1', {
-                                    className: 'text-5xl font-black text-white mb-2',
-                                    style: { textShadow: '3px 3px 6px rgba(0,0,0,0.5)' }
-                                }, 'YOU\'RE INVITED!'),
-                                e('div', { className: 'wiggle-animation inline-block text-6xl mt-4' }, '🎅')
-                            ),
+        // Get current difficulty based on level
+        function getCurrentDifficulty() {
+            if (gameState.level < 6) return "easy";
+            if (gameState.level < 16) return "medium";
+            return "hard";
+        }
 
-                            // Main Content
-                            e('div', { className: 'p-8' },
-                                // Title
-                                e('div', { className: 'text-center mb-8' },
-                                    e('h2', { className: 'text-4xl font-bold text-red-600 mb-2' },
-                                        'Annual Holiday Party'
-                                    ),
-                                    e('div', { className: 'flex justify-center items-center gap-3 text-5xl mb-4' },
-                                        e('span', { className: 'wiggle-animation' }, '🧶'),
-                                        e('h3', { className: 'text-3xl font-bold text-green-600' },
-                                            'Ugly Sweater Edition'
-                                        ),
-                                        e('span', { className: 'wiggle-animation' }, '🧣')
-                                    )
-                                ),
+        // Get questions for current difficulty
+        function getAvailableQuestions() {
+            const difficulty = getCurrentDifficulty();
+            const availableQuestions = questions.filter(q => q.difficulty === difficulty);
 
-                                // Party Details
-                                e('div', { className: 'bg-gradient-to-r from-red-50 to-green-50 rounded-2xl p-6 mb-6' },
-                                    e('div', { className: 'space-y-4' },
-                                        // Date & Time
-                                        e('div', { className: 'flex items-center gap-4' },
-                                            e('div', { className: 'text-4xl' }, '📅'),
-                                            e('div', null,
-                                                e('p', { className: 'text-lg font-bold text-gray-800' }, 'When'),
-                                                e('p', { className: 'text-xl text-red-600 font-semibold' },
-                                                    'December 6th at 3:00 PM'
-                                                )
-                                            )
-                                        ),
+            // Shuffle and return
+            return availableQuestions.sort(() => Math.random() - 0.5);
+        }
 
-                                        // Location
-                                        e('div', { className: 'flex items-center gap-4' },
-                                            e('div', { className: 'text-4xl' }, '🏠'),
-                                            e('div', null,
-                                                e('p', { className: 'text-lg font-bold text-gray-800' }, 'Where'),
-                                                e('p', { className: 'text-xl text-green-600 font-semibold' },
-                                                    '3356 New Castle Drive'
-                                                )
-                                            )
-                                        ),
+        // Display current question
+        function displayQuestion() {
+            const availableQuestions = getAvailableQuestions();
+            const question = availableQuestions[gameState.currentQuestionIndex % availableQuestions.length];
 
-                                        // Theme
-                                        e('div', { className: 'flex items-center gap-4' },
-                                            e('div', { className: 'text-4xl bounce-animation' }, '🎄'),
-                                            e('div', null,
-                                                e('p', { className: 'text-lg font-bold text-gray-800' }, 'Theme'),
-                                                e('p', { className: 'text-xl text-purple-600 font-semibold' },
-                                                    'Wear Your Ugliest Sweater!'
-                                                )
-                                            )
-                                        ),
+            document.getElementById('questionNumber').textContent = `Question ${gameState.questionsAnswered + 1}`;
+            document.getElementById('questionText').textContent = question.q;
 
-                                        // Food
-                                        e('div', { className: 'flex items-center gap-4' },
-                                            e('div', { className: 'text-4xl' }, '🍪'),
-                                            e('div', null,
-                                                e('p', { className: 'text-lg font-bold text-gray-800' }, 'Bring'),
-                                                e('p', { className: 'text-xl text-orange-600 font-semibold' },
-                                                    'A Finger Food to Share'
-                                                )
-                                            )
-                                        )
-                                    )
-                                ),
+            const difficultyBadge = document.getElementById('difficultyBadge');
+            difficultyBadge.textContent = question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1);
+            difficultyBadge.className = `difficulty-badge difficulty-${question.difficulty}`;
 
-                                // Fun decorative elements
-                                e('div', { className: 'text-center mb-6' },
-                                    e('div', { className: 'flex justify-center gap-4 text-4xl mb-4' },
-                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0s' } }, '🎁'),
-                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0.2s' } }, '⛄'),
-                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0.4s' } }, '🎅'),
-                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0.6s' } }, '🦌'),
-                                        e('span', { className: 'bounce-animation', style: { animationDelay: '0.8s' } }, '❄️')
-                                    ),
-                                    e('p', { className: 'text-2xl font-bold text-red-600 mb-2' },
-                                        'Get Ready to Jingle & Mingle!'
-                                    ),
-                                    e('p', { className: 'text-gray-600 italic' },
-                                        'The uglier the sweater, the better!'
-                                    )
-                                ),
+            const answersGrid = document.getElementById('answersGrid');
+            answersGrid.innerHTML = '';
 
-                                // RSVP Section
-                                !rsvpStatus ? (
-                                    e('div', { className: 'bg-blue-50 rounded-2xl p-6' },
-                                        e('h3', { className: 'text-xl font-bold text-center text-blue-900 mb-4' },
-                                            'Will you be joining us?'
-                                        ),
-                                        e('div', { className: 'mb-4' },
-                                            e('input', {
-                                                type: 'text',
-                                                placeholder: 'Your Name',
-                                                value: guestName,
-                                                onChange: (e) => setGuestName(e.target.value),
-                                                className: 'w-full p-3 rounded-xl border-2 border-blue-300 focus:border-blue-500 focus:outline-none text-lg'
-                                            })
-                                        ),
-                                        e('div', { className: 'flex gap-3' },
-                                            e('button', {
-                                                onClick: () => guestName.trim() && setRsvpStatus('yes'),
-                                                disabled: !guestName.trim(),
-                                                className: 'flex-1 bg-green-500 text-white py-3 px-6 rounded-xl text-lg font-bold hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all transform hover:scale-105'
-                                            }, '✓ Yes!'),
-                                            e('button', {
-                                                onClick: () => guestName.trim() && setRsvpStatus('maybe'),
-                                                disabled: !guestName.trim(),
-                                                className: 'flex-1 bg-yellow-500 text-white py-3 px-6 rounded-xl text-lg font-bold hover:bg-yellow-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all transform hover:scale-105'
-                                            }, '? Maybe'),
-                                            e('button', {
-                                                onClick: () => guestName.trim() && setRsvpStatus('no'),
-                                                disabled: !guestName.trim(),
-                                                className: 'flex-1 bg-red-500 text-white py-3 px-6 rounded-xl text-lg font-bold hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all transform hover:scale-105'
-                                            }, '✗ No')
-                                        )
-                                    )
-                                ) : (
-                                    e('div', { className: 'bg-green-50 rounded-2xl p-6 text-center' },
-                                        e('div', { className: 'text-5xl mb-3' },
-                                            rsvpStatus === 'yes' ? '🎉' : rsvpStatus === 'maybe' ? '🤔' : '😢'
-                                        ),
-                                        e('p', { className: 'text-2xl font-bold mb-2' },
-                                            rsvpStatus === 'yes'
-                                                ? `Awesome, ${guestName}! Can't wait to see you!`
-                                                : rsvpStatus === 'maybe'
-                                                    ? `Thanks ${guestName}! Hope you can make it!`
-                                                    : `Sorry you can't make it, ${guestName}!`
-                                        ),
-                                        e('button', {
-                                            onClick: () => { setRsvpStatus(null); setGuestName(''); },
-                                            className: 'mt-3 text-blue-600 font-semibold hover:underline'
-                                        }, 'Change RSVP')
-                                    )
-                                )
-                            )
-                        ),
+            question.a.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = answer;
+                btn.onclick = () => checkAnswer(index, question.correct);
+                answersGrid.appendChild(btn);
+            });
 
-                        // Action Buttons (outside the card for download)
-                        e('div', { className: 'no-print flex flex-col sm:flex-row gap-4' },
-                            e('button', {
-                                onClick: handleDownload,
-                                disabled: downloading,
-                                className: 'flex-1 bg-red-600 text-white py-4 px-6 rounded-2xl text-xl font-bold hover:bg-red-700 disabled:bg-gray-400 transition-all transform hover:scale-105 pulse-glow flex items-center justify-center gap-2'
-                            },
-                                downloading ? 'Preparing...' : '📥 Download Invitation'
-                            ),
-                            e('button', {
-                                onClick: handleShare,
-                                className: 'flex-1 bg-green-600 text-white py-4 px-6 rounded-2xl text-xl font-bold hover:bg-green-700 transition-all transform hover:scale-105 pulse-glow flex items-center justify-center gap-2'
-                            },
-                                '📱 Share via Text'
-                            )
-                        ),
+            document.getElementById('feedbackSection').className = 'feedback-section';
+            document.getElementById('feedbackSection').style.display = 'none';
+            document.getElementById('nextBtn').classList.remove('show');
+        }
 
-                        // Instructions
-                        e('div', { className: 'no-print text-center mt-4 text-white text-sm' },
-                            e('p', { className: 'mb-2' }, '💡 Tip: Download the image or click share to send via text message!'),
-                            e('p', null, 'On mobile, you can also take a screenshot to share directly.')
-                        )
-                    )
-                )
-            );
-        };
+        // Check answer
+        function checkAnswer(selected, correct) {
+            gameState.questionsAnswered++;
 
-        // Render the app
-        ReactDOM.render(e(UglySweaterParty), document.getElementById('root'));
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach((btn, index) => {
+                btn.disabled = true;
+                if (index === correct) {
+                    btn.classList.add('correct');
+                } else if (index === selected && selected !== correct) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            const feedbackSection = document.getElementById('feedbackSection');
+
+            if (selected === correct) {
+                // Correct answer
+                gameState.questionsCorrect++;
+                gameState.streak++;
+
+                // Progressive scoring - harder questions worth more
+                let points = 10;
+                if (getCurrentDifficulty() === "medium") points = 20;
+                if (getCurrentDifficulty() === "hard") points = 30;
+
+                // Bonus for streak
+                const streakBonus = Math.min(gameState.streak, 10) * 2;
+                points += streakBonus;
+
+                gameState.score += points;
+                gameState.coins += points / 2;
+
+                feedbackSection.className = 'feedback-section correct';
+                feedbackSection.innerHTML = `
+                    <div style="font-size: 2em; margin-bottom: 10px;">🎉 Correct!</div>
+                    <div>+${points} points | +${points/2} coins</div>
+                    ${gameState.streak > 1 ? `<div>🔥 ${gameState.streak} streak! +${streakBonus} bonus</div>` : ''}
+                `;
+            } else {
+                // Incorrect answer
+                gameState.streak = 0;
+
+                feedbackSection.className = 'feedback-section incorrect';
+                feedbackSection.innerHTML = `
+                    <div style="font-size: 2em; margin-bottom: 10px;">❌ Not quite!</div>
+                    <div>The correct answer was: ${questions.find(q => q.correct === correct)?.a[correct] || 'N/A'}</div>
+                    <div>Keep learning! 📚</div>
+                `;
+            }
+
+            // Check for level up
+            const questionsForNextLevel = gameState.level * 10;
+            if (gameState.questionsCorrect >= questionsForNextLevel) {
+                gameState.level++;
+                showCelebration('level');
+            }
+
+            document.getElementById('nextBtn').classList.add('show');
+            updateDisplay();
+            saveGame();
+        }
+
+        // Next question
+        function nextQuestion() {
+            gameState.currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        // Update all displays
+        function updateDisplay() {
+            document.getElementById('levelDisplay').textContent = gameState.level;
+            document.getElementById('scoreDisplay').textContent = gameState.score;
+            document.getElementById('coinsDisplay').textContent = Math.floor(gameState.coins);
+            document.getElementById('streakDisplay').textContent = gameState.streak;
+
+            // Update character badge
+            let currentTitle = characterTitles[0];
+            for (let title of characterTitles) {
+                if (gameState.level >= title.level) {
+                    currentTitle = title;
+                }
+            }
+            document.getElementById('characterBadge').textContent = `${currentTitle.title} - Level ${gameState.level}`;
+
+            // Update progress bar
+            const questionsForNextLevel = gameState.level * 10;
+            const progress = (gameState.questionsCorrect / questionsForNextLevel) * 100;
+            document.getElementById('progressFill').style.width = `${Math.min(progress, 100)}%`;
+            document.getElementById('progressFill').textContent = `${gameState.questionsCorrect}/${questionsForNextLevel} to next level`;
+
+            // Update zoo display
+            updateZooDisplay();
+            updateShopDisplay();
+        }
+
+        // Update zoo display
+        function updateZooDisplay() {
+            const zooGrid = document.getElementById('zooGrid');
+            zooGrid.innerHTML = '';
+
+            zooAnimals.forEach((animal, index) => {
+                const div = document.createElement('div');
+                div.className = `zoo-animal ${animal.unlocked ? '' : 'locked'}`;
+                div.innerHTML = `
+                    <div class="emoji">${animal.emoji}</div>
+                    <div class="name">${animal.name}</div>
+                `;
+                zooGrid.appendChild(div);
+            });
+        }
+
+        // Update shop display
+        function updateShopDisplay() {
+            const shopGrid = document.getElementById('shopGrid');
+            shopGrid.innerHTML = '';
+
+            zooAnimals.forEach((animal, index) => {
+                if (!animal.unlocked) {
+                    const div = document.createElement('div');
+                    div.className = 'shop-item';
+                    div.innerHTML = `
+                        <div class="emoji">${animal.emoji}</div>
+                        <div class="name">${animal.name}</div>
+                        <div class="price">🪙 ${animal.cost}</div>
+                        <button class="buy-btn" onclick="buyAnimal(${index})" ${gameState.coins < animal.cost ? 'disabled' : ''}>
+                            ${gameState.coins >= animal.cost ? 'Buy' : 'Not enough coins'}
+                        </button>
+                    `;
+                    shopGrid.appendChild(div);
+                }
+            });
+
+            if (shopGrid.children.length === 0) {
+                shopGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 1.5em; color: var(--neutral-gray);">🎉 You\'ve collected all the animals! You\'re an amazing zookeeper!</div>';
+            }
+        }
+
+        // Buy animal
+        function buyAnimal(index) {
+            const animal = zooAnimals[index];
+            if (!animal.unlocked && gameState.coins >= animal.cost) {
+                gameState.coins -= animal.cost;
+                animal.unlocked = true;
+                gameState.unlockedAnimals.push(index);
+
+                showCelebration('animal', animal);
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        // Show celebration modal
+        function showCelebration(type, animal = null) {
+            const modal = document.getElementById('celebrationModal');
+            const title = document.getElementById('celebrationTitle');
+            const text = document.getElementById('celebrationText');
+
+            if (type === 'level') {
+                title.textContent = `🎉 Level ${gameState.level}!`;
+                text.textContent = `Congratulations! You've reached level ${gameState.level}! Questions will now be ${getCurrentDifficulty()}!`;
+            } else if (type === 'animal') {
+                title.textContent = `🎊 New Animal!`;
+                text.textContent = `You've added ${animal.emoji} ${animal.name} to your zoo!`;
+            }
+
+            modal.classList.add('show');
+        }
+
+        // Close celebration
+        function closeCelebration() {
+            document.getElementById('celebrationModal').classList.remove('show');
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            if (tab === 'quiz') {
+                document.getElementById('quizTab').classList.add('active');
+            } else if (tab === 'zoo') {
+                document.getElementById('zooTab').classList.add('active');
+            } else if (tab === 'shop') {
+                document.getElementById('shopTab').classList.add('active');
+            }
+
+            gameState.currentTab = tab;
+        }
+
+        // Initialize game
+        loadGame();
+        displayQuestion();
     </script>
 </body>
 </html>
