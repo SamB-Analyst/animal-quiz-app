@@ -59,6 +59,26 @@ Progress from Junior Zookeeper to Zoo Director through 10 career stages:
 5. Visit the Shop to buy new animals for your zoo
 6. Check your zoo to see your collection grow
 
+## Install on Your Phone (PWA)
+
+You can install Zoo Quest on your phone like a native app!
+
+### iPhone/iPad (Safari):
+1. Open the app in Safari browser
+2. Tap the Share button (square with arrow pointing up)
+3. Scroll down and tap "Add to Home Screen"
+4. Tap "Add" in the top right
+5. The Zoo Quest icon will appear on your home screen!
+
+### Android (Chrome):
+1. Open the app in Chrome browser
+2. Tap the three dots menu (⋮) in the top right
+3. Tap "Add to Home screen" or "Install app"
+4. Tap "Add" or "Install"
+5. The Zoo Quest icon will appear on your home screen!
+
+Once installed, the app works offline and your progress is automatically saved!
+
 ## Perfect For
 
 - Kids ages 5-12 who love animals
